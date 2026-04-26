@@ -5,19 +5,15 @@
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
-    
-    <ion-title>Kontak</ion-title>
-
+    <ion-title>Kontak Favorit</ion-title>
     <ion-buttons slot="end">
-      <!-- Sort Button -->
       <ion-button class="sort-btn" (click)="toggleSortMenu()">
         <ion-icon name="arrow-up-down" color="primary"></ion-icon>
       </ion-button>
-
-      <!-- Search Button -->
       <ion-button (click)="toggleSearchBar()">
         <ion-icon name="search" color="primary"></ion-icon>
       </ion-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 
@@ -59,7 +55,7 @@
   <ion-toolbar *ngIf="showSearchBar" class="search-toolbar">
     <ion-searchbar 
       [(ngModel)]="searchQuery"
-      placeholder="Cari kontak..."
+      placeholder="Cari favorit..."
       (ionChange)="onSearch()"
       showCancelButton="always"
       (ionCancel)="toggleSearchBar()"
@@ -69,33 +65,33 @@
 
 <ion-content>
   <!-- Empty State -->
-  <div *ngIf="displayedContacts.length === 0" class="empty-state">
-    <ion-icon name="people" class="empty-icon"></ion-icon>
-    <p>Belum ada kontak</p>
-    <p class="subtitle">Tekan tombol + untuk menambah kontak pertama Anda</p>
+  <div *ngIf="displayedFavorites.length === 0" class="empty-state">
+    <ion-icon name="star" class="empty-icon"></ion-icon>
+    <p>{{ searchQuery.trim() ? 'Tidak ada hasil' : 'Belum ada favorit' }}</p>
+    <p class="subtitle">{{ searchQuery.trim() ? 'Coba cari dengan kata kunci lain' : 'Tandai kontak favorit dengan ikon bintang' }}</p>
   </div>
 
-  <!-- Contacts List -->
-  <ion-list *ngIf="displayedContacts.length > 0" class="contacts-list">
+  <!-- Favorites List -->
+  <ion-list *ngIf="displayedFavorites.length > 0" class="contacts-list">
     <ion-item 
-      *ngFor="let contact of displayedContacts"
-      [routerLink]="'/contact-detail/' + contact.id"
+      *ngFor="let contact of displayedFavorites"
+      (click)="viewContact(contact.id)"
       class="contact-item"
     >
-      <ion-avatar slot="start" class="contact-avatar">
+      <div class="contact-avatar">
         <img 
           *ngIf="contact.profileImage" 
           [src]="contact.profileImage"
           alt="Profile"
         >
         <div *ngIf="!contact.profileImage" class="avatar-placeholder">
-          {{ (contact.firstName.charAt(0) + contact.lastName.charAt(0)) | uppercase }}
+          {{ contact.firstName.charAt(0) }}{{ contact.lastName.charAt(0) }}
         </div>
-      </ion-avatar>
-
-      <ion-label>
-        <h2 class="contact-name">{{ contact.firstName }} {{ contact.lastName }}</h2>
-        <p *ngIf="contact.company" class="contact-company">{{ contact.company }}</p>
+      </div>
+      
+      <div class="contact-info">
+        <h3>{{ contact.firstName }} {{ contact.lastName }}</h3>
+        <p *ngIf="contact.company">{{ contact.company }}</p>
         <div class="contact-labels" *ngIf="getLabelsForContact(contact.id).length > 0">
           <ion-chip 
             *ngFor="let label of getLabelsForContact(contact.id)" 
@@ -105,28 +101,17 @@
             {{ label }}
           </ion-chip>
         </div>
-      </ion-label>
+      </div>
 
-      <ion-icon 
-        slot="end"
-        [name]="contact.isFavorite ? 'star' : 'star-outline'"
-        [color]="contact.isFavorite ? 'warning' : 'medium'"
-        (click)="toggleFavorite($event, contact.id)"
-        class="favorite-icon"
-      ></ion-icon>
+      <ion-buttons slot="end">
+        <ion-button 
+          fill="clear"
+          (click)="toggleFavorite($event, contact.id)"
+          class="favorite-btn"
+        >
+          <ion-icon name="star" color="primary"></ion-icon>
+        </ion-button>
+      </ion-buttons>
     </ion-item>
   </ion-list>
 </ion-content>
-
-<!-- FAB (Square Button with Rounded Corners) -->
-<div class="fab-button-container">
-  <ion-button 
-    (click)="addNewContact()" 
-    color="primary"
-    class="custom-fab-button"
-    fill="solid"
-    shape="round"
-  >
-    <ion-icon name="add" slot="icon-only"></ion-icon>
-  </ion-button>
-</div>

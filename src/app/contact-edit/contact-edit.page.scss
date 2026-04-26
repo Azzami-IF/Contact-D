@@ -1,0 +1,205 @@
+// Profile Section
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #427AB5, #2d5a8c);
+  color: white;
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    border: 3px solid white;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .placeholder {
+      ion-icon {
+        font-size: 48px;
+        color: white;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .upload-btn {
+    background: white;
+    color: #427AB5;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.95);
+    }
+  }
+}
+
+// Form Styles
+.contact-form {
+  padding: 0;
+  background: var(--ion-background-color);
+
+  ion-card {
+    margin-bottom: 12px;
+    border-radius: 12px;
+
+    ion-card-header {
+      padding-bottom: 10px;
+
+      ion-card-title {
+        color: var(--ion-color-primary);
+        font-weight: 600;
+        font-size: 16px;
+      }
+    }
+
+    ion-card-content {
+      ion-item {
+        margin-bottom: 12px;
+        --padding-start: 0;
+        --inner-padding-end: 0;
+        border-bottom: 1px solid var(--ion-color-light);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+        }
+
+        ion-label {
+          margin-bottom: 8px;
+          display: block;
+          color: var(--ion-color-dark);
+
+          strong {
+            color: var(--ion-color-primary);
+          }
+        }
+
+        ion-input,
+        ion-select,
+        ion-textarea {
+          --padding-top: 8px;
+          --padding-bottom: 8px;
+          --placeholder-opacity: 0.6;
+        }
+      }
+    }
+  }
+}
+
+// Dynamic Fields
+.field-wrapper {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  .field-row {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+
+    ion-item {
+      flex: 1;
+      --padding-start: 0;
+      --padding-end: 0;
+      --border-bottom: 1px solid var(--ion-color-light);
+      margin: 0;
+
+      ion-input {
+        --padding-start: 0;
+      }
+    }
+  }
+
+  .delete-field-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 8px;
+
+    ion-icon {
+      font-size: 24px;
+      color: #e74c3c;
+    }
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  padding: 20px 16px;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+
+  ion-button {
+    ion-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Labels Section
+.selected-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  min-height: 40px;
+  align-items: center;
+
+  ion-chip {
+    font-weight: 500;
+
+    .remove-label {
+      margin-left: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        opacity: 0.7;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.label-selector-btn {
+  --border-color: #427AB5;
+  --color: #427AB5;
+  --background: white;
+
+  &:hover {
+    --background: rgba(66, 122, 181, 0.1);
+  }
+}

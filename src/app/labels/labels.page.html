@@ -1,0 +1,56 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()" fill="clear" color="primary">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Kelola Label</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSearchBar()">
+        <ion-icon name="search" color="primary"></ion-icon>
+      </ion-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Search Bar -->
+  <ion-toolbar *ngIf="showSearchBar" class="search-toolbar">
+    <ion-searchbar 
+      [(ngModel)]="searchQuery"
+      placeholder="Cari label..."
+      (ionChange)="onSearch()"
+      showCancelButton="always"
+      (ionCancel)="toggleSearchBar()"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Empty State -->
+  <div *ngIf="displayedLabels.length === 0" class="empty-state">
+    <ion-icon name="pricetag" class="empty-icon"></ion-icon>
+    <p>{{ searchQuery.trim() ? 'Tidak ada hasil' : 'Belum ada label' }}</p>
+    <p class="subtitle">{{ searchQuery.trim() ? 'Coba cari dengan kata kunci lain' : 'Tambahkan label saat membuat atau mengedit kontak' }}</p>
+  </div>
+
+  <!-- Labels List -->
+  <div *ngIf="displayedLabels.length > 0" class="labels-container">
+    <ion-card *ngFor="let item of displayedLabels" class="label-card">
+      <ion-card-content class="label-content">
+        <div class="label-info" (click)="viewLabelDetails(item.label)">
+          <h3>{{ item.label }}</h3>
+          <p class="label-count">{{ item.count }} kontak</p>
+        </div>
+        <ion-button 
+          fill="clear"
+          color="danger"
+          (click)="deleteLabel(item.label)"
+          class="delete-btn"
+        >
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

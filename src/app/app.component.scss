@@ -1,0 +1,128 @@
+// Custom Sidebar
+.custom-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 80%;
+  max-width: 280px;
+  background: white;
+  z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  ion-header {
+    ion-toolbar {
+      --background: #427AB5;
+      flex-shrink: 0;
+    }
+
+    ion-title {
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+
+  ion-content {
+    --background: #f9fafb;
+    flex: 1;
+    overflow-y: auto;
+
+    ion-list {
+      padding: 0;
+      background: transparent;
+
+      .menu-item {
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --min-height: 48px;
+        margin-bottom: 4px;
+        --border-width: 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        ion-icon {
+          margin-right: 12px;
+          font-size: 20px;
+        }
+
+        ion-label {
+          font-size: 15px;
+          font-weight: 500;
+          color: #333;
+        }
+
+        &:hover {
+          background: rgba(66, 122, 181, 0.05);
+        }
+
+        &:active,
+        &.active {
+          --background: rgba(66, 122, 181, 0.1);
+          ion-label {
+            color: #427AB5;
+            font-weight: 600;
+          }
+        }
+
+        &.danger {
+          ion-label {
+            color: #ff4444;
+          }
+
+          &:hover {
+            background: rgba(255, 68, 68, 0.05);
+          }
+
+          &:active {
+            --background: rgba(255, 68, 68, 0.1);
+          }
+        }
+      }
+
+      ion-item-divider {
+        background: transparent;
+        border-bottom: 1px solid #e0e0e0;
+        min-height: 16px;
+        margin: 8px 0;
+      }
+    }
+  }
+}
+
+// Sidebar Overlay
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .custom-sidebar {
+    width: 100%;
+    max-width: none;
+  }
+}
+

@@ -1,0 +1,218 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()" fill="clear" color="primary">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Tambah Kontak</ion-title>
+    <ion-buttons slot="end">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="contactForm">
+    <!-- Profile Picture Section -->
+    <div class="profile-section">
+      <div class="profile-image">
+        <img 
+          *ngIf="profileImageUrl" 
+          [src]="profileImageUrl"
+          alt="Profile"
+        >
+        <div *ngIf="!profileImageUrl" class="placeholder">
+          <ion-icon name="camera"></ion-icon>
+        </div>
+      </div>
+      <input 
+        #fileInput 
+        type="file" 
+        accept="image/*"
+        (change)="onImageSelected($event)"
+        hidden
+      >
+      <button 
+        type="button"
+        class="upload-btn"
+        (click)="fileInput.click()"
+      >
+        <ion-icon name="camera"></ion-icon>
+        Upload Foto
+      </button>
+    </div>
+
+    <!-- Basic Information -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Informasi Dasar</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <!-- First Name -->
+        <ion-item>
+          <ion-label position="stacked"><strong>Nama Depan *</strong></ion-label>
+          <ion-input
+            type="text"
+            formControlName="firstName"
+            placeholder="Masukkan nama depan"
+            clearInput="true"
+          ></ion-input>
+        </ion-item>
+
+        <!-- Last Name -->
+        <ion-item>
+          <ion-label position="stacked"><strong>Nama Belakang *</strong></ion-label>
+          <ion-input
+            type="text"
+            formControlName="lastName"
+            placeholder="Masukkan nama belakang"
+            clearInput="true"
+          ></ion-input>
+        </ion-item>
+
+        <!-- Company -->
+        <ion-item>
+          <ion-label position="stacked"><strong>Perusahaan (Opsional)</strong></ion-label>
+          <ion-input
+            type="text"
+            formControlName="company"
+            placeholder="Nama perusahaan"
+            clearInput="true"
+          ></ion-input>
+        </ion-item>
+
+        <!-- Notes -->
+        <ion-item>
+          <ion-label position="stacked"><strong>Catatan (Opsional)</strong></ion-label>
+          <ion-textarea
+            formControlName="notes"
+            placeholder="Tambahkan catatan tentang kontak ini"
+            rows="3"
+          ></ion-textarea>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Labels Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Labels</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="selected-labels">
+          <ion-chip 
+            *ngFor="let label of selectedLabelsArray"
+            color="primary"
+            outline="false"
+          >
+            <ion-label>{{ label }}</ion-label>
+            <ion-icon 
+              name="close-circle" 
+              (click)="toggleLabel(label)"
+              class="remove-label"
+            ></ion-icon>
+          </ion-chip>
+        </div>
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="primary"
+          (click)="showLabelSelector()"
+          class="label-selector-btn"
+        >
+          <ion-icon name="pricetag" slot="start"></ion-icon>
+          {{ selectedLabelsArray.length > 0 ? 'Ubah Labels' : 'Tambah Labels' }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Dynamic Additional Fields -->
+    <ion-card *ngIf="additionalFields.length > 0">
+      <ion-card-header>
+        <ion-card-title>Informasi Tambahan</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <div 
+          *ngFor="let field of additionalFields; let i = index"
+          class="field-wrapper"
+        >
+          <div class="field-row">
+            <ion-item>
+              <ion-label position="stacked">
+                <strong>{{ getFieldLabel(field.type, field.customFieldName) }}</strong>
+              </ion-label>
+
+              <!-- Text Input -->
+              <ion-input
+                *ngIf="field.type !== 'birthday'"
+                type="text"
+                [(ngModel)]="field.value"
+                [placeholder]="getFieldPlaceholder(field.type)"
+                clearInput="true"
+              ></ion-input>
+
+              <!-- Birthday Input -->
+              <ion-input
+                *ngIf="field.type === 'birthday'"
+                type="date"
+                [(ngModel)]="field.value"
+              ></ion-input>
+            </ion-item>
+
+            <!-- Delete Button -->
+            <button
+              type="button"
+              class="delete-field-btn"
+              (click)="removeField(i)"
+              title="Hapus field ini"
+            >
+              <ion-icon name="remove-circle"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Add More Fields Button -->
+    <ion-card>
+      <ion-card-content>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="primary"
+          (click)="showAddFieldMenu()"
+        >
+          <ion-icon name="add-circle" slot="start"></ion-icon>
+          Tambahkan Info Lain
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="saveContact()"
+        [disabled]="!isFormValid()"
+      >
+        <ion-icon name="save" slot="start"></ion-icon>
+        Simpan Kontak
+      </ion-button>
+      <ion-button
+        expand="block"
+        color="medium"
+        (click)="cancel()"
+      >
+        <ion-icon name="close" slot="start"></ion-icon>
+        Batal
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

@@ -1,0 +1,132 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()" fill="clear" color="primary">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Detail Kontak</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleFavorite()">
+        <ion-icon 
+          [name]="contact?.isFavorite ? 'star' : 'star-outline'"
+        ></ion-icon>
+      </ion-button>
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar color="primary">
+      <ion-title size="large">Detail Kontak</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div *ngIf="contact" class="contact-detail">
+    <!-- Profile Card -->
+    <ion-card class="profile-card">
+      <ion-card-content class="profile-content">
+        <div class="avatar-large">
+          <img 
+            *ngIf="contact.profileImage" 
+            [src]="contact.profileImage"
+            alt="Profile"
+          >
+          <div *ngIf="!contact.profileImage" class="avatar-placeholder">
+            {{ contact.firstName.charAt(0) }}{{ contact.lastName.charAt(0) }}
+          </div>
+        </div>
+        <h1>{{ contact.firstName }} {{ contact.lastName }}</h1>
+        <p *ngIf="contact.company" class="company">{{ contact.company }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Labels -->
+    <ion-card *ngIf="getLabelsForContact(contact.id).length > 0">
+      <ion-card-header>
+        <ion-card-title>Labels</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="label-container">
+          <ion-chip 
+            *ngFor="let label of getLabelsForContact(contact.id)"
+            color="primary"
+            outline="false"
+            class="detail-label-chip"
+          >
+            <ion-icon name="pricetag"></ion-icon>
+            <ion-label>{{ label }}</ion-label>
+          </ion-chip>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Basic Information -->
+    <ion-card *ngIf="contact.notes">
+      <ion-card-header>
+        <ion-card-title>Catatan</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-text>{{ contact.notes }}</ion-text>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Additional Fields -->
+    <ion-card *ngIf="getAdditionalFieldsWithoutLabels().length > 0">
+      <ion-card-header>
+        <ion-card-title>Informasi Lainnya</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none" *ngFor="let field of getAdditionalFieldsWithoutLabels()">
+          <ion-icon [name]="getFieldIcon(field)" slot="start" color="primary"></ion-icon>
+          <ion-label position="stacked">
+            <strong>{{ getFieldLabel(field) }}</strong>
+          </ion-label>
+          <ion-text>{{ field.value }}</ion-text>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- System Information -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Informasi Sistem</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item lines="none">
+          <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+          <ion-label position="stacked"><strong>Dibuat</strong></ion-label>
+          <ion-text>{{ contact.createdAt | date: 'dd MMMM yyyy, HH:mm' }}</ion-text>
+        </ion-item>
+        
+        <ion-item lines="none" *ngIf="contact.updatedAt !== contact.createdAt">
+          <ion-icon name="time" slot="start" color="primary"></ion-icon>
+          <ion-label position="stacked"><strong>Diubah</strong></ion-label>
+          <ion-text>{{ contact.updatedAt | date: 'dd MMMM yyyy, HH:mm' }}</ion-text>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button expand="block" color="primary" (click)="editContact()">
+        <ion-icon name="pencil" slot="start"></ion-icon>
+        Edit Kontak
+      </ion-button>
+      <ion-button expand="block" color="danger" (click)="deleteContact()">
+        <ion-icon name="trash" slot="start"></ion-icon>
+        Hapus Kontak
+      </ion-button>
+    </div>
+  </div>
+
+  <div *ngIf="!contact" class="no-contact">
+    <ion-icon name="alert-circle"></ion-icon>
+    <h2>Kontak Tidak Ditemukan</h2>
+    <p>Kontak yang Anda cari tidak ada</p>
+  </div>
+</ion-content>

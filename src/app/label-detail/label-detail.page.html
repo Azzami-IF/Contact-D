@@ -1,0 +1,84 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="openMenu()" fill="clear" color="primary">
+        <ion-icon slot="icon-only" name="menu"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ labelName }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSearchBar()">
+        <ion-icon name="search" color="primary"></ion-icon>
+      </ion-button>
+      <ion-back-button defaultHref="/labels"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Search Bar -->
+  <ion-toolbar *ngIf="showSearchBar" class="search-toolbar">
+    <ion-searchbar 
+      [(ngModel)]="searchQuery"
+      placeholder="Cari kontak..."
+      (ionChange)="onSearch()"
+      showCancelButton="always"
+      (ionCancel)="toggleSearchBar()"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Empty State -->
+  <div *ngIf="displayedContacts.length === 0" class="empty-state">
+    <ion-icon name="person" class="empty-icon"></ion-icon>
+    <p>{{ searchQuery.trim() ? 'Tidak ada hasil' : 'Tidak ada kontak dengan label ini' }}</p>
+    <p class="subtitle">{{ searchQuery.trim() ? 'Coba cari dengan kata kunci lain' : 'Tambahkan label saat membuat atau mengedit kontak' }}</p>
+  </div>
+
+  <!-- Contacts List -->
+  <ion-list *ngIf="displayedContacts.length > 0" class="contacts-list">
+    <ion-item 
+      *ngFor="let contact of displayedContacts"
+      (click)="viewContact(contact.id)"
+      class="contact-item"
+    >
+      <div class="contact-avatar">
+        <img 
+          *ngIf="contact.profileImage" 
+          [src]="contact.profileImage"
+          alt="Profile"
+        >
+        <div *ngIf="!contact.profileImage" class="avatar-placeholder">
+          {{ contact.firstName.charAt(0) }}{{ contact.lastName.charAt(0) }}
+        </div>
+      </div>
+      
+      <div class="contact-info">
+        <h3>{{ contact.firstName }} {{ contact.lastName }}</h3>
+        <p *ngIf="contact.company">{{ contact.company }}</p>
+        <div class="contact-labels" *ngIf="getLabelsForContact(contact.id).length > 0">
+          <ion-chip 
+            *ngFor="let label of getLabelsForContact(contact.id)" 
+            size="small"
+            class="label-chip"
+          >
+            {{ label }}
+          </ion-chip>
+        </div>
+      </div>
+
+      <ion-buttons slot="end">
+        <ion-button 
+          fill="clear"
+          (click)="toggleFavorite($event, contact.id)"
+          class="favorite-btn"
+        >
+          <ion-icon 
+            slot="icon-only"
+            [name]="contact.isFavorite ? 'star' : 'star-outline'"
+            [color]="contact.isFavorite ? 'warning' : 'medium'"
+          ></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+</ion-content>
