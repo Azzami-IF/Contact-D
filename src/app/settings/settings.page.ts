@@ -41,8 +41,4 @@ export class SettingsPage implements OnInit {
       }
     }
   }
-
-  openMenu() {
-    this.sidebarService.openSidebar();
-  }
 }

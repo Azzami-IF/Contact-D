@@ -1,17 +1,47 @@
 // Variables
 $primary-color: #427AB5;
-$text-dark: #333;
-$text-light: #999;
 $border-color: #f0f0f0;
-$background-light: #f8f9fa;
 
-// Search Toolbar
-.search-toolbar {
-  --background: $background-light;
-  border-bottom: 1px solid $border-color;
+// Contacts List - uses global .contact-item styles
+.contacts-list {
+  padding-top: 8px;
+
+  .contact-item {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.selected-item {
+      --background: rgba(66, 122, 181, 0.08);
+      .contact-avatar {
+        border: 2px solid $primary-color;
+        padding: 2px;
+        transform: scale(0.9);
+      }
+    }
+
+    ion-checkbox {
+      margin-right: 12px;
+      --border-radius: 6px;
+      --size: 22px;
+    }
+  }
 }
 
-// Empty State
+.contact-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+  .label-chip {
+    height: 20px;
+    font-size: 10px;
+    --background: rgba(66, 122, 181, 0.1);
+    --color: #427AB5;
+    padding: 0 6px;
+    margin: 0;
+  }
+}
+
+// Empty State Consistency
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -19,105 +49,9 @@ $background-light: #f8f9fa;
   justify-content: center;
   height: 60vh;
   text-align: center;
-  color: $text-light;
+  padding: 20px;
 
-  .empty-icon {
-    font-size: 64px;
-    color: $primary-color;
-    opacity: 0.5;
-    margin-bottom: 16px;
-  }
-
-  p {
-    margin: 8px 0;
-    font-size: 14px;
-
-    &.subtitle {
-      color: #bbb;
-      font-size: 12px;
-    }
-  }
-}
-
-// Contacts List
-.contacts-list {
-  --padding-start: 0;
-  --padding-end: 0;
-
-  .contact-item {
-    --padding-start: 16px;
-    --padding-end: 16px;
-    --inner-padding-end: 0;
-    margin-bottom: 8px;
-    border-bottom: 1px solid $border-color;
-    cursor: pointer;
-
-    .contact-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: $primary-color;
-      margin-right: 16px;
-      overflow: hidden;
-      flex-shrink: 0;
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .avatar-placeholder {
-        color: white;
-        font-weight: 600;
-        font-size: 16px;
-      }
-    }
-
-    .contact-info {
-      flex: 1;
-
-      h3 {
-        margin: 0;
-        color: $text-dark;
-        font-size: 16px;
-        font-weight: 600;
-      }
-
-      p {
-        margin: 4px 0 0 0;
-        color: $text-light;
-        font-size: 12px;
-      }
-
-      .contact-labels {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        margin-top: 6px;
-
-        .label-chip {
-          height: auto;
-          font-size: 11px;
-          --background: rgba(66, 122, 181, 0.1);
-          --color: #427AB5;
-          padding: 4px 8px;
-          font-weight: 500;
-
-          ion-icon {
-            display: none;
-          }
-        }
-      }
-    }
-
-    .favorite-btn {
-      --icon-font-size: 24px;
-      --padding-start: 8px;
-      --padding-end: 8px;
-    }
-  }
+  .empty-icon { font-size: 80px; color: #e0e0e0; margin-bottom: 16px; }
+  p { color: #999; font-size: 14px; margin: 4px 0; }
+  .subtitle { color: #bbb; font-size: 12px; }
 }

@@ -1,18 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-button (click)="openMenu()" fill="clear" color="primary">
+      <ion-back-button defaultHref="/home" color="light"></ion-back-button>
+      <ion-button (click)="openMenu()" fill="clear" color="light">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>Detail Kontak</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="toggleFavorite()">
-        <ion-icon 
+      <ion-button (click)="toggleFavorite()" color="light">
+        <ion-icon
           [name]="contact?.isFavorite ? 'star' : 'star-outline'"
         ></ion-icon>
       </ion-button>
-      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -29,8 +29,8 @@
     <ion-card class="profile-card">
       <ion-card-content class="profile-content">
         <div class="avatar-large">
-          <img 
-            *ngIf="contact.profileImage" 
+          <img
+            *ngIf="contact.profileImage"
             [src]="contact.profileImage"
             alt="Profile"
           >
@@ -50,11 +50,12 @@
       </ion-card-header>
       <ion-card-content>
         <div class="label-container">
-          <ion-chip 
+          <ion-chip
             *ngFor="let label of getLabelsForContact(contact.id)"
             color="primary"
             outline="false"
             class="detail-label-chip"
+            [routerLink]="['/label-detail', label]"
           >
             <ion-icon name="pricetag"></ion-icon>
             <ion-label>{{ label }}</ion-label>
@@ -102,7 +103,7 @@
           <ion-label position="stacked"><strong>Dibuat</strong></ion-label>
           <ion-text>{{ contact.createdAt | date: 'dd MMMM yyyy, HH:mm' }}</ion-text>
         </ion-item>
-        
+
         <ion-item lines="none" *ngIf="contact.updatedAt !== contact.createdAt">
           <ion-icon name="time" slot="start" color="primary"></ion-icon>
           <ion-label position="stacked"><strong>Diubah</strong></ion-label>

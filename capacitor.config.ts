@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'id.ac.uts.contactapp', // Diperbarui agar lebih profesional untuk UTS
   appName: 'ContactApp',
   webDir: 'www'
 };

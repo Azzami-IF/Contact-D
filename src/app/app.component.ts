@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
-import { ContactService } from './services/contact.service';
+import { AlertController, Platform } from '@ionic/angular';
 import { SidebarService } from './services/sidebar.service';
+import { ThemeService } from './services/theme.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-root',
@@ -16,10 +18,30 @@ export class AppComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private contactService: ContactService,
     private alertController: AlertController,
-    private sidebarService: SidebarService
-  ) {}
+    private sidebarService: SidebarService,
+    private themeService: ThemeService,
+    private platform: Platform
+  ) {
+    this.initializeApp();
+  }
+
+  initializeApp() {
+    this.platform.ready().then(() => {
+      if (this.platform.is('capacitor')) {
+        StatusBar.setStyle({ style: Style.Default });
+
+        // Handle Hardware Back Button Android
+        App.addListener('backButton', ({ canGoBack }) => {
+          if (this.sidebarOpen) {
+            this.closeSidebar();
+          } else if (!canGoBack) {
+            App.exitApp();
+          }
+        });
+      }
+    });
+  }
 
   ngOnInit() {
     this.sidebarService.sidebarOpen$
@@ -40,49 +62,5 @@ export class AppComponent implements OnInit, OnDestroy {
 
   closeSidebar(): void {
     this.sidebarService.closeSidebar();
-  }
-
-  exportAndClose(): void {
-    this.exportContacts();
-    this.closeSidebar();
-  }
-
-  deleteAndClose(): void {
-    this.deleteAllContacts();
-    this.closeSidebar();
-  }
-
-  async exportContacts(): Promise<void> {
-    const contacts = this.contactService.getContacts();
-    const dataStr = JSON.stringify(contacts, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    const exportFileDefaultName = `contacts_${new Date().getTime()}.json`;
-
-    const link = document.createElement('a');
-    link.setAttribute('href', dataUri);
-    link.setAttribute('download', exportFileDefaultName);
-    link.click();
-  }
-
-  async deleteAllContacts(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Hapus Semua Kontak',
-      message: 'Apakah Anda yakin ingin menghapus semua kontak? Tindakan ini tidak dapat dibatalkan.',
-      buttons: [
-        {
-          text: 'Batal',
-          role: 'cancel',
-        },
-        {
-          text: 'Hapus',
-          role: 'destructive',
-          handler: () => {
-            this.contactService.clearAll();
-          },
-        },
-      ],
-    });
-
-    await alert.present();
   }
 }

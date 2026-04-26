@@ -31,6 +31,10 @@ const routes: Routes = [
     loadChildren: () => import('./label-detail/label-detail.module').then( m => m.LabelDetailPageModule)
   },
   {
+    path: 'settings',
+    loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

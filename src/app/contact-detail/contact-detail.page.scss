@@ -1,166 +1,91 @@
+// Detail Page Styles
 .contact-detail {
-  padding: 20px 0;
+  padding-bottom: 32px;
+}
 
-  .profile-card {
-    margin-bottom: 20px;
-    border-radius: 16px;
+.profile-card {
+  margin: 16px;
+  text-align: center;
 
-    .profile-content {
-      text-align: center;
-      padding: 30px 20px;
-
-      .avatar-large {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #427AB5 0%, #2c5aa0 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 48px;
-        font-weight: bold;
-        margin: 0 auto 20px;
-        box-shadow: 0 4px 12px rgba(66, 122, 181, 0.3);
-        overflow: hidden;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .avatar-placeholder {
-          font-size: 48px;
-          font-weight: bold;
-        }
-      }
-
-      h1 {
-        margin: 10px 0;
-        color: var(--ion-color-dark);
-        font-size: 24px;
-        font-weight: 600;
-      }
-
-      .company {
-        margin: 8px 0 0 0;
-        color: #999;
-        font-size: 14px;
-      }
-    }
+  .profile-content {
+    padding: 24px 16px;
   }
 
-  ion-card {
-    margin-bottom: 15px;
-    border-radius: 12px;
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 16px 0 4px;
+    color: var(--ion-text-color);
+  }
 
-    ion-card-header {
-      padding-bottom: 10px;
-
-      ion-card-title {
-        color: var(--ion-color-primary);
-        font-weight: 600;
-        font-size: 16px;
-      }
-    }
-
-    ion-card-content {
-      ion-item {
-        margin-bottom: 15px;
-        --padding-start: 0;
-        --inner-padding-end: 0;
-        border-bottom: 1px solid var(--ion-color-light);
-        align-items: flex-start;
-
-        &:last-child {
-          margin-bottom: 0;
-          border-bottom: none;
-        }
-
-        ion-icon {
-          margin-right: 12px;
-          margin-top: 8px;
-        }
-
-        ion-label {
-          margin-bottom: 8px;
-          display: block;
-
-          strong {
-            color: var(--ion-color-primary);
-          }
-        }
-
-        ion-text {
-          color: var(--ion-color-dark);
-          word-wrap: break-word;
-          white-space: normal;
-          margin-top: 8px;
-        }
-      }
-    }
+  .company {
+    font-size: 0.95rem;
+    color: var(--ion-color-medium);
+    font-weight: 500;
   }
 }
 
-// Labels Section
+.avatar-large {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-placeholder {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+  }
+}
+
 .label-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 4px 0;
+}
 
-  .detail-label-chip {
-    font-weight: 500;
+.detail-label-chip {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+  --color: var(--ion-color-primary);
+  font-weight: 600;
+  height: 32px;
+
+  ion-icon {
     font-size: 14px;
-    height: auto;
-    padding: 8px 12px;
-
-    ion-icon {
-      margin-right: 4px;
-      font-size: 16px;
-    }
-
-    ion-label {
-      margin: 0;
-    }
   }
 }
 
 .action-buttons {
-  padding: 20px 15px;
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
+  padding: 8px 16px;
 
   ion-button {
-    ion-icon {
-      margin-right: 8px;
-    }
+    margin-bottom: 12px;
+    --border-radius: 8px;
+    height: 48px;
+    font-weight: 600;
   }
 }
 
-.no-contact {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 60vh;
-  text-align: center;
-  color: var(--ion-color-medium);
+ion-card-content {
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
 
-  ion-icon {
-    font-size: 80px;
-    margin-bottom: 20px;
-    color: var(--ion-color-light-shade);
-  }
-
-  h2 {
-    margin: 10px 0;
-    color: var(--ion-color-dark);
-  }
-
-  p {
-    margin: 10px 0;
-    color: var(--ion-color-medium);
+    ion-text {
+      font-size: 0.95rem;
+    }
   }
 }

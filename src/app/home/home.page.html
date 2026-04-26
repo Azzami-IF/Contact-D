@@ -1,90 +1,148 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
+  <!-- Main Toolbar -->
+  <ion-toolbar *ngIf="!isSelectionMode" color="primary">
     <ion-buttons slot="start">
-      <ion-button (click)="openMenu()" fill="clear" color="primary">
+      <ion-button *ngIf="!showSearchBar" (click)="openMenu()" fill="clear" color="light">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
+      <ion-button *ngIf="showSearchBar" (click)="toggleSearchBar()" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    
-    <ion-title>Kontak</ion-title>
+
+    <ion-title *ngIf="!showSearchBar">Kontak</ion-title>
+
+    <ion-searchbar
+      *ngIf="showSearchBar"
+      [(ngModel)]="searchQuery"
+      placeholder="Cari nama atau perusahaan..."
+      (ionChange)="onSearch()"
+      class="header-searchbar"
+      autofocus="true"
+    ></ion-searchbar>
 
     <ion-buttons slot="end">
-      <!-- Sort Button -->
-      <ion-button class="sort-btn" (click)="toggleSortMenu()">
-        <ion-icon name="arrow-up-down" color="primary"></ion-icon>
+      <!-- Search Button -->
+      <ion-button *ngIf="!showSearchBar" (click)="toggleSearchBar()" color="light">
+        <ion-icon name="search" slot="icon-only"></ion-icon>
       </ion-button>
 
-      <!-- Search Button -->
-      <ion-button (click)="toggleSearchBar()">
-        <ion-icon name="search" color="primary"></ion-icon>
+      <!-- Sort Button -->
+      <ion-button id="sort-trigger" color="light">
+        <ion-icon name="swap-vertical" slot="icon-only"></ion-icon>
+      </ion-button>
+
+      <ion-popover trigger="sort-trigger" size="auto" alignment="end" #sortPopover>
+        <ng-template>
+          <ion-list lines="none" class="popover-list">
+            <ion-item button (click)="setSortBy('name-asc'); sortPopover.dismiss()">
+              <ion-icon [name]="currentSort === 'name-asc' ? 'radio-button-on' : 'radio-button-off'" slot="start" color="primary"></ion-icon>
+              <ion-label>Nama (A-Z)</ion-label>
+            </ion-item>
+            <ion-item button (click)="setSortBy('name-desc'); sortPopover.dismiss()">
+              <ion-icon [name]="currentSort === 'name-desc' ? 'radio-button-on' : 'radio-button-off'" slot="start" color="primary"></ion-icon>
+              <ion-label>Nama (Z-A)</ion-label>
+            </ion-item>
+            <ion-item button (click)="setSortBy('date-desc'); sortPopover.dismiss()">
+              <ion-icon [name]="currentSort === 'date-desc' ? 'radio-button-on' : 'radio-button-off'" slot="start" color="primary"></ion-icon>
+              <ion-label>Terbaru</ion-label>
+            </ion-item>
+            <ion-item button (click)="setSortBy('date-asc'); sortPopover.dismiss()">
+              <ion-icon [name]="currentSort === 'date-asc' ? 'radio-button-on' : 'radio-button-off'" slot="start" color="primary"></ion-icon>
+              <ion-label>Terlama</ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Selection Mode Toolbar -->
+  <ion-toolbar *ngIf="isSelectionMode" color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="exitSelectionMode()" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>{{ selectedIds.size }} Terpilih</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="selectAll()" fill="clear" color="light">
+        <ion-icon slot="icon-only" [name]="selectedIds.size === displayedContacts.length ? 'checkbox' : 'checkbox-outline'"></ion-icon>
+      </ion-button>
+      <ion-button (click)="favoriteSelected()" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="star"></ion-icon>
+      </ion-button>
+      <ion-button (click)="addLabelSelected()" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="pricetag"></ion-icon>
+      </ion-button>
+      <ion-button (click)="deleteSelected()" fill="clear" color="light">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 
-  <!-- Sort Dropdown Menu -->
-  <ion-toolbar *ngIf="showSortMenu" class="sort-menu">
-    <div class="sort-options">
-      <button 
-        (click)="setSortBy('name-asc')"
-        [class.active]="currentSort === 'name-asc'"
+  <!-- Smart Label Tags Bar -->
+  <ion-toolbar *ngIf="!isSelectionMode" class="tags-toolbar">
+    <div class="tags-scroll-container">
+      <!-- "Semua" chip - only shown when NO filters are active -->
+      <ion-chip
+        *ngIf="activeFilters.length === 0"
+        class="filter-chip active-tag"
       >
-        <ion-icon name="arrow-up"></ion-icon>
-        Nama (A-Z)
-      </button>
-      <button 
-        (click)="setSortBy('name-desc')"
-        [class.active]="currentSort === 'name-desc'"
-      >
-        <ion-icon name="arrow-down"></ion-icon>
-        Nama (Z-A)
-      </button>
-      <button 
-        (click)="setSortBy('date-asc')"
-        [class.active]="currentSort === 'date-asc'"
-      >
-        <ion-icon name="calendar"></ion-icon>
-        Terbaru
-      </button>
-      <button 
-        (click)="setSortBy('date-desc')"
-        [class.active]="currentSort === 'date-desc'"
-      >
-        <ion-icon name="calendar"></ion-icon>
-        Terlama
-      </button>
-    </div>
-  </ion-toolbar>
+        <ion-label>Semua</ion-label>
+      </ion-chip>
 
-  <!-- Search Bar -->
-  <ion-toolbar *ngIf="showSearchBar" class="search-toolbar">
-    <ion-searchbar 
-      [(ngModel)]="searchQuery"
-      placeholder="Cari kontak..."
-      (ionChange)="onSearch()"
-      showCancelButton="always"
-      (ionCancel)="toggleSearchBar()"
-    ></ion-searchbar>
+      <!-- Active label chips -->
+      <ion-chip
+        *ngFor="let label of activeFilters"
+        class="filter-chip active-tag"
+      >
+        <ion-icon name="pricetag" class="tag-icon-small"></ion-icon>
+        <ion-label>{{ label }}</ion-label>
+        <ion-icon name="close-circle" (click)="removeFilter(label)" class="remove-icon"></ion-icon>
+      </ion-chip>
+
+      <!-- Add Filter Button -->
+      <ion-chip (click)="openFilterModal()" class="add-chip">
+        <ion-icon name="add"></ion-icon>
+      </ion-chip>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <!-- Empty State -->
   <div *ngIf="displayedContacts.length === 0" class="empty-state">
-    <ion-icon name="people" class="empty-icon"></ion-icon>
-    <p>Belum ada kontak</p>
-    <p class="subtitle">Tekan tombol + untuk menambah kontak pertama Anda</p>
+    <ion-icon name="people-outline" class="empty-icon"></ion-icon>
+    <p>{{ searchQuery.trim() || activeFilters.length > 0 ? 'Kontak tidak ditemukan' : 'Belum ada kontak' }}</p>
+    <p class="subtitle">Tekan tombol + untuk menambah kontak baru</p>
   </div>
 
   <!-- Contacts List -->
   <ion-list *ngIf="displayedContacts.length > 0" class="contacts-list">
-    <ion-item 
+    <ion-item
       *ngFor="let contact of displayedContacts"
-      [routerLink]="'/contact-detail/' + contact.id"
+      (click)="onItemClick(contact)"
+      (mousedown)="startPress(contact.id)"
+      (mouseup)="endPress()"
+      (touchstart)="startPress(contact.id)"
+      (touchend)="endPress()"
       class="contact-item"
+      [class.selected-item]="isSelected(contact.id)"
     >
+      <ion-checkbox
+        *ngIf="isSelectionMode"
+        slot="start"
+        [checked]="isSelected(contact.id)"
+        (click)="$event.stopPropagation()"
+        (ionChange)="toggleSelection(contact.id)"
+      ></ion-checkbox>
+
       <ion-avatar slot="start" class="contact-avatar">
-        <img 
-          *ngIf="contact.profileImage" 
+        <img
+          *ngIf="contact.profileImage"
           [src]="contact.profileImage"
           alt="Profile"
         >
@@ -97,8 +155,8 @@
         <h2 class="contact-name">{{ contact.firstName }} {{ contact.lastName }}</h2>
         <p *ngIf="contact.company" class="contact-company">{{ contact.company }}</p>
         <div class="contact-labels" *ngIf="getLabelsForContact(contact.id).length > 0">
-          <ion-chip 
-            *ngFor="let label of getLabelsForContact(contact.id)" 
+          <ion-chip
+            *ngFor="let label of getLabelsForContact(contact.id)"
             size="small"
             class="label-chip"
           >
@@ -107,7 +165,8 @@
         </div>
       </ion-label>
 
-      <ion-icon 
+      <ion-icon
+        *ngIf="!isSelectionMode"
         slot="end"
         [name]="contact.isFavorite ? 'star' : 'star-outline'"
         [color]="contact.isFavorite ? 'warning' : 'medium'"
@@ -118,15 +177,53 @@
   </ion-list>
 </ion-content>
 
-<!-- FAB (Square Button with Rounded Corners) -->
-<div class="fab-button-container">
-  <ion-button 
-    (click)="addNewContact()" 
-    color="primary"
-    class="custom-fab-button"
-    fill="solid"
-    shape="round"
-  >
+<!-- Searchable Label Selector Modal -->
+<ion-modal [isOpen]="isLabelModalOpen" (didDismiss)="closeLabelModal()" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5, 0.8]">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar color="primary">
+        <ion-title>{{ labelModalMode === 'filter' ? 'Pilih Filter Label' : 'Tambahkan Label' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeLabelModal()" color="light">Tutup</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+      <ion-toolbar color="primary">
+        <ion-searchbar
+          [(ngModel)]="labelSearchQuery"
+          placeholder="Cari atau buat label..."
+          (ionChange)="filterLabels()"
+          class="header-searchbar"
+        ></ion-searchbar>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list lines="full">
+        <!-- Option to create new if it doesn't exist (Only in 'apply' mode) -->
+        <ion-item button (click)="onLabelSelected(labelSearchQuery.trim())"
+          *ngIf="labelModalMode === 'apply' && labelSearchQuery.trim() && !filteredLabels.includes(labelSearchQuery.trim())">
+          <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            Buat Label Baru: "<strong>{{ labelSearchQuery }}</strong>"
+          </ion-label>
+        </ion-item>
+
+        <!-- List of filtered labels -->
+        <ion-item button *ngFor="let label of filteredLabels" (click)="onLabelSelected(label)">
+          <ion-icon name="pricetag-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            {{ label }}
+            <ion-text color="primary" *ngIf="labelModalMode === 'filter' && activeFilters.includes(label)">
+              <ion-icon name="checkmark-outline"></ion-icon>
+            </ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<div class="fab-button-container" *ngIf="!isSelectionMode">
+  <ion-button (click)="addNewContact()" color="primary" class="custom-fab-button" fill="solid" shape="round">
     <ion-icon name="add" slot="icon-only"></ion-icon>
   </ion-button>
 </div>

@@ -20,7 +20,7 @@ export class LabelService {
   getAllLabels(): string[] {
     const allLabels = new Set<string>();
     const contacts = this.contactService.getContacts();
-    
+
     contacts.forEach(contact => {
       contact.additionalFields.forEach(field => {
         if (field.type === 'label' && field.value) {
@@ -28,7 +28,7 @@ export class LabelService {
         }
       });
     });
-    
+
     return Array.from(allLabels).sort();
   }
 
@@ -69,7 +69,7 @@ export class LabelService {
 
     if (!hasLabel && labelName.trim()) {
       contact.additionalFields.push({
-        id: Date.now().toString(),
+        id: `label-${Date.now()}`,
         type: 'label',
         label: 'Label',
         value: labelName.trim(),
@@ -109,7 +109,7 @@ export class LabelService {
    */
   deleteLabel(labelName: string): void {
     const contacts = this.getContactsWithLabel(labelName);
-    
+
     contacts.forEach(contact => {
       contact.additionalFields = contact.additionalFields.filter(
         field => !(field.type === 'label' && field.value === labelName)
@@ -123,7 +123,7 @@ export class LabelService {
    */
   renameLabel(oldName: string, newName: string): void {
     const contacts = this.getContactsWithLabel(oldName);
-    
+
     contacts.forEach(contact => {
       contact.additionalFields = contact.additionalFields.map(field => {
         if (field.type === 'label' && field.value === oldName) {

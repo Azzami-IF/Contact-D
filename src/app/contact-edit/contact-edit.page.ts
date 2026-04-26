@@ -51,7 +51,7 @@ export class ContactEditPage implements OnInit, OnDestroy {
   ) {
     this.contactForm = this.formBuilder.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      lastName: [''],
       company: [''],
       notes: [''],
     });
@@ -89,12 +89,12 @@ export class ContactEditPage implements OnInit, OnDestroy {
             });
             this.profileImageUrl = this.contact.profileImage || null;
             this.profileImageBase64 = this.contact.profileImage || null;
-            
+
             // Separate labels from other fields
             this.additionalFields = this.contact.additionalFields
               .filter(field => field.type !== 'label')
               .map(field => ({ ...field }));
-            
+
             // Load selected labels
             this.selectedLabels.clear();
             this.contact.additionalFields
@@ -316,11 +316,11 @@ export class ContactEditPage implements OnInit, OnDestroy {
     }
 
     const fieldsWithLabels = [...this.additionalFields];
-    
+
     // Add selected labels
-    this.selectedLabels.forEach(label => {
+    this.selectedLabels.forEach((label, index) => {
       fieldsWithLabels.push({
-        id: Date.now().toString(),
+        id: `label-${Date.now()}-${index}`,
         type: 'label',
         label: 'Label',
         value: label,

@@ -100,7 +100,7 @@ export class ContactService {
       const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
       const company = (contact.company || '').toLowerCase();
       const notes = (contact.notes || '').toLowerCase();
-      
+
       if (fullName.includes(lowerQuery) || company.includes(lowerQuery) || notes.includes(lowerQuery)) {
         return true;
       }
@@ -169,6 +169,11 @@ export class ContactService {
       });
     });
     return Array.from(labels).sort();
+  }
+
+  // Public helper for import
+  importContactsData(contacts: Contact[]): void {
+    this.saveAndUpdate(contacts);
   }
 
   // Private helper

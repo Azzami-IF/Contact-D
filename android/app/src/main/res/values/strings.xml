@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ContactApp</string>
+    <string name="title_activity_main">ContactApp</string>
+    <string name="package_name">id.ac.uts.contactapp</string>
+    <string name="custom_url_scheme">id.ac.uts.contactapp</string>
+</resources>

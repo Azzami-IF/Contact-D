@@ -48,7 +48,7 @@ export class ContactAddPage implements OnInit, OnDestroy {
   ) {
     this.contactForm = this.formBuilder.group({
       firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      lastName: [''],
       company: [''],
       notes: [''],
     });
@@ -288,11 +288,11 @@ export class ContactAddPage implements OnInit, OnDestroy {
     }
 
     const fieldsWithLabels = [...this.additionalFields];
-    
+
     // Add selected labels
-    this.selectedLabels.forEach(label => {
+    this.selectedLabels.forEach((label, index) => {
       fieldsWithLabels.push({
-        id: Date.now().toString(),
+        id: `label-${Date.now()}-${index}`,
         type: 'label',
         label: 'Label',
         value: label,

@@ -1,22 +1,21 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-button (click)="openMenu()" fill="clear" color="primary">
+      <ion-button (click)="openMenu()" fill="clear" color="light">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>Kelola Label</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="toggleSearchBar()">
-        <ion-icon name="search" color="primary"></ion-icon>
+      <ion-button (click)="toggleSearchBar()" color="light">
+        <ion-icon name="search"></ion-icon>
       </ion-button>
-      <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 
   <!-- Search Bar -->
   <ion-toolbar *ngIf="showSearchBar" class="search-toolbar">
-    <ion-searchbar 
+    <ion-searchbar
       [(ngModel)]="searchQuery"
       placeholder="Cari label..."
       (ionChange)="onSearch()"
@@ -42,7 +41,7 @@
           <h3>{{ item.label }}</h3>
           <p class="label-count">{{ item.count }} kontak</p>
         </div>
-        <ion-button 
+        <ion-button
           fill="clear"
           color="danger"
           (click)="deleteLabel(item.label)"

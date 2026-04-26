@@ -1,14 +1,12 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-button (click)="openMenu()" fill="clear" color="primary">
+      <ion-back-button [defaultHref]="'/contact-detail/' + contactId" color="light"></ion-back-button>
+      <ion-button (click)="openMenu()" fill="clear" color="light">
         <ion-icon slot="icon-only" name="menu"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>Edit Kontak</ion-title>
-    <ion-buttons slot="end">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -17,8 +15,8 @@
     <!-- Profile Picture Section -->
     <div class="profile-section">
       <div class="profile-image">
-        <img 
-          *ngIf="profileImageUrl" 
+        <img
+          *ngIf="profileImageUrl"
           [src]="profileImageUrl"
           alt="Profile"
         >
@@ -26,14 +24,14 @@
           <ion-icon name="camera"></ion-icon>
         </div>
       </div>
-      <input 
-        #fileInput 
-        type="file" 
+      <input
+        #fileInput
+        type="file"
         accept="image/*"
         (change)="onImageSelected($event)"
         hidden
       >
-      <button 
+      <button
         type="button"
         class="upload-btn"
         (click)="fileInput.click()"
@@ -103,22 +101,22 @@
       </ion-card-header>
       <ion-card-content>
         <div class="selected-labels">
-          <ion-chip 
+          <ion-chip
             *ngFor="let label of selectedLabelsArray"
             color="primary"
             outline="false"
           >
             <ion-label>{{ label }}</ion-label>
-            <ion-icon 
-              name="close-circle" 
+            <ion-icon
+              name="close-circle"
               (click)="toggleLabel(label)"
               class="remove-label"
             ></ion-icon>
           </ion-chip>
         </div>
-        <ion-button 
-          expand="block" 
-          fill="outline" 
+        <ion-button
+          expand="block"
+          fill="outline"
           color="primary"
           (click)="showLabelSelector()"
           class="label-selector-btn"
@@ -136,7 +134,7 @@
       </ion-card-header>
       <ion-card-content>
 
-        <div 
+        <div
           *ngFor="let field of additionalFields; let i = index"
           class="field-wrapper"
         >

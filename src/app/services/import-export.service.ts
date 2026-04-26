@@ -53,7 +53,7 @@ export class ImportExportService {
         // Force reload contacts in service if needed, or just use service method
         // Since ContactService uses BehaviorSubject, we should update it
         // Actually it's better if ContactService has a setContacts method
-        (this.contactService as any).saveAndUpdate(merged);
+        this.contactService.importContactsData(merged);
 
         await this.showToast('Data kontak berhasil diimport');
         return true;
