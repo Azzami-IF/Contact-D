@@ -2,57 +2,43 @@
  * App Global CSS
  */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
+// Use dark.class to support manual theme switching via body.dark
 @import "@ionic/angular/css/palettes/dark.class.css";
 
 :root {
   --ion-font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
-  --contact-avatar-size: 48px;
-  --contact-item-padding: 12px;
 }
 
 body {
   font-family: var(--ion-font-family);
-}
-
-// Consistent Typography
-h1, h2, h3 {
-  font-family: var(--ion-font-family);
-  font-weight: 700;
-}
-
-ion-title {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: -0.3px;
+  background: var(--ion-background-color);
+  color: var(--ion-text-color);
 }
 
 // Global List Item Standard
 .contact-item {
-  --padding-start: var(--contact-item-padding);
-  --padding-end: var(--contact-item-padding);
+  --padding-start: 12px;
+  --padding-end: 12px;
   --padding-top: 10px;
   --padding-bottom: 10px;
   --inner-padding-end: 0;
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
 
   .contact-avatar {
-    width: var(--contact-avatar-size);
-    height: var(--contact-avatar-size);
+    width: 48px;
+    height: 48px;
     margin-right: 16px;
     border-radius: 50%;
     overflow: hidden;
@@ -73,15 +59,12 @@ ion-title {
   }
 
   h2, h3 {
+    color: var(--ion-text-color);
     margin: 0;
-    font-size: 1rem;
     font-weight: 600;
-    line-height: 1.2;
   }
 
   p {
-    margin: 4px 0 0 0;
-    font-size: 0.85rem;
     color: var(--ion-color-medium);
   }
 }
@@ -91,31 +74,51 @@ ion-card {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   margin: 16px;
-
-  ion-card-header {
-    padding-bottom: 8px;
-  }
-
-  ion-card-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--ion-color-primary);
-  }
+  --background: var(--ion-card-background);
+  color: var(--ion-text-color);
 }
 
-// Floating Action Button Consistency
-.custom-fab-button {
-  --border-radius: 12px;
-  width: 56px;
-  height: 56px;
-  box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+body.dark ion-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-// Dark Mode Consistency
-body.dark {
-  ion-card {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+ion-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.3px;
+  color: var(--ion-color-primary-contrast, white);
+}
+
+// Modern Toast Styling (Translucent)
+.modern-toast {
+  --background: rgba(0, 0, 0, 0.7);
+  --color: white;
+  --border-radius: 25px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+body.dark .modern-toast {
+  --background: rgba(255, 255, 255, 0.2);
+}
+
+// Ensure all items use correct backgrounds
+ion-item {
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  --border-color: var(--ion-border-color);
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+ion-header.ion-no-border {
+  border: none;
 }

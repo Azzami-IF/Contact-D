@@ -29,17 +29,19 @@
   </ion-list-header>
 
   <ion-list inset="true">
-    <ion-item button (click)="onExport()">
-      <ion-icon name="download-outline" slot="start" color="primary"></ion-icon>
+    <ion-item button (click)="onExport()" detail="true">
+      <ion-icon name="cloud-upload-outline" slot="start" color="medium"></ion-icon>
       <ion-label>
-        <h2>Export Kontak</h2>
+        <h2 style="font-weight: 400;">Export Kontak</h2>
+        <p style="font-size: 0.85rem; color: var(--ion-color-medium);">Simpan data ke file JSON</p>
       </ion-label>
     </ion-item>
 
-    <ion-item button (click)="fileInput.click()">
-      <ion-icon name="cloud-upload-outline" slot="start" color="primary"></ion-icon>
+    <ion-item button (click)="fileInput.click()" detail="true">
+      <ion-icon name="download-outline" slot="start" color="medium"></ion-icon>
       <ion-label>
-        <h2>Import Kontak</h2>
+        <h2 style="font-weight: 400;">Import Kontak</h2>
+        <p style="font-size: 0.85rem; color: var(--ion-color-medium);">Muat data dari file JSON</p>
       </ion-label>
       <input #fileInput type="file" (change)="onImport($event)" accept=".json" hidden>
     </ion-item>

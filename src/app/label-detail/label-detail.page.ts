@@ -168,8 +168,9 @@ export class LabelDetailPage implements OnInit, OnDestroy {
   private async showToast(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
-      position: 'bottom'
+      duration: 1500,
+      position: 'middle',
+      cssClass: 'modern-toast'
     });
     await toast.present();
   }

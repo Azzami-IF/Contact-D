@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Contact, SortBy } from '../models/contact.model';
+import { Preferences } from '@capacitor/preferences';
 
 @Injectable({
   providedIn: 'root',
@@ -16,17 +17,16 @@ export class ContactService {
   public sortBy$ = this.sortBySubject.asObservable();
 
   private readonly STORAGE_KEY = 'contacts';
-  private readonly FAVORITES_KEY = 'favorite_contacts';
 
   constructor() {
     this.loadFromStorage();
   }
 
-  // Load dari localStorage
-  private loadFromStorage(): void {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    if (stored) {
-      const contacts = JSON.parse(stored);
+  // Load dari Capacitor Preferences (Lebih stabil dari localStorage)
+  private async loadFromStorage(): Promise<void> {
+    const { value } = await Preferences.get({ key: this.STORAGE_KEY });
+    if (value) {
+      const contacts = JSON.parse(value);
       this.contactsSubject.next(contacts);
       this.updateFavorites();
     }
@@ -105,7 +105,6 @@ export class ContactService {
         return true;
       }
 
-      // Search in additional fields
       return contact.additionalFields.some(field =>
         field.value.toLowerCase().includes(lowerQuery)
       );
@@ -149,36 +148,17 @@ export class ContactService {
     this.sortBySubject.next(sortBy);
   }
 
-  // Filter by label
-  getContactsByLabel(label: string): Contact[] {
-    return this.getContacts().filter(contact =>
-      contact.additionalFields.some(
-        field => field.type === 'label' && field.value === label
-      )
-    );
-  }
-
-  // Get all labels used in contacts
-  getAllLabels(): string[] {
-    const labels = new Set<string>();
-    this.getContacts().forEach(contact => {
-      contact.additionalFields.forEach(field => {
-        if (field.type === 'label' && field.value) {
-          labels.add(field.value);
-        }
-      });
-    });
-    return Array.from(labels).sort();
-  }
-
   // Public helper for import
   importContactsData(contacts: Contact[]): void {
     this.saveAndUpdate(contacts);
   }
 
   // Private helper
-  private saveAndUpdate(contacts: Contact[]): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(contacts));
+  private async saveAndUpdate(contacts: Contact[]): Promise<void> {
+    await Preferences.set({
+      key: this.STORAGE_KEY,
+      value: JSON.stringify(contacts),
+    });
     this.contactsSubject.next(contacts);
     this.updateFavorites();
   }
@@ -188,8 +168,8 @@ export class ContactService {
   }
 
   // Clear all
-  clearAll(): void {
-    localStorage.removeItem(this.STORAGE_KEY);
+  async clearAll(): Promise<void> {
+    await Preferences.remove({ key: this.STORAGE_KEY });
     this.contactsSubject.next([]);
     this.favoriteContactsSubject.next([]);
   }

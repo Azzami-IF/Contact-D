@@ -1,11 +1,10 @@
-// Variables
-$primary-color: #427AB5;
-$border-color: #f0f0f0;
+// Custom Colors
+$primary-color: var(--ion-color-primary);
 
 // Sort Menu
 .sort-menu {
-  border-bottom: 1px solid $border-color;
-  background: white;
+  border-bottom: 1px solid var(--ion-border-color);
+  --background: var(--ion-background-color);
 
   .sort-options {
     display: grid;
@@ -14,7 +13,7 @@ $border-color: #f0f0f0;
     padding: 8px 12px;
 
     button {
-      background: #f4f5f8;
+      background: var(--ion-color-step-100);
       border: 1px solid transparent;
       border-radius: 8px;
       padding: 10px 8px;
@@ -24,7 +23,8 @@ $border-color: #f0f0f0;
       gap: 6px;
       font-size: 12px;
       font-weight: 500;
-      color: #666;
+      color: var(--ion-text-color);
+      opacity: 0.8;
       cursor: pointer;
       transition: all 0.2s ease;
 
@@ -32,16 +32,18 @@ $border-color: #f0f0f0;
 
       &.active {
         background: $primary-color;
-        color: white;
-        box-shadow: 0 2px 6px rgba(66, 122, 181, 0.3);
+        color: var(--ion-color-primary-contrast);
+        opacity: 1;
+        box-shadow: 0 2px 6px rgba(var(--ion-color-primary-rgb), 0.3);
       }
     }
   }
 }
 
-// Contacts List - uses global .contact-item styles
+// Contacts List Standard
 .contacts-list {
   padding-top: 8px;
+  background: transparent;
 }
 
 .contact-labels {
@@ -52,8 +54,8 @@ $border-color: #f0f0f0;
   .label-chip {
     height: 20px;
     font-size: 10px;
-    --background: rgba(66, 122, 181, 0.1);
-    --color: #427AB5;
+    --background: rgba(var(--ion-color-primary-rgb), 0.1);
+    --color: var(--ion-color-primary);
     padding: 0 6px;
     margin: 0;
   }
@@ -69,20 +71,24 @@ $border-color: #f0f0f0;
   text-align: center;
   padding: 20px;
 
-  .empty-icon { font-size: 80px; color: #e0e0e0; margin-bottom: 16px; }
-  p { color: #999; font-size: 14px; margin: 4px 0; }
-  .subtitle { color: #bbb; font-size: 12px; }
-}
+  .empty-icon {
+    font-size: 100px;
+    color: var(--ion-color-medium);
+    margin-bottom: 20px;
+    opacity: 0.2;
+  }
 
-// Dark Mode Support
-:host-context(body.dark) {
-  .sort-menu {
-    background: #1e1e1e;
-    border-bottom-color: #333;
-    .sort-options button {
-      background: #333;
-      color: #bbb;
-      &.active { background: $primary-color; color: white; }
-    }
+  p {
+    color: var(--ion-color-medium);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .subtitle {
+    color: var(--ion-color-step-400, #999);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    opacity: 0.8;
   }
 }

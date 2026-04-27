@@ -8,6 +8,7 @@ import { SidebarService } from '../services/sidebar.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-home',
@@ -39,6 +40,9 @@ export class HomePage implements OnInit, OnDestroy {
   private pressTimer: any;
   private isLongPress: boolean = false;
 
+  private lastBackPress = 0;
+  private backPressThreshold = 2000;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -58,9 +62,20 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   setupAndroidBackButton() {
-    this.platform.backButton.subscribeWithPriority(10, () => {
-      if (this.isSelectionMode) {
+    this.platform.backButton.subscribeWithPriority(10, (processNextHandler) => {
+      if (this.sidebarService.isSidebarOpen()) {
+        this.sidebarService.closeSidebar();
+      } else if (this.isSelectionMode) {
         this.exitSelectionMode();
+      } else if (this.router.url === '/home' || this.router.url === '/') {
+        if (Date.now() - this.lastBackPress < this.backPressThreshold) {
+          App.exitApp();
+        } else {
+          this.lastBackPress = Date.now();
+          this.showToast('Tekan sekali lagi untuk keluar');
+        }
+      } else {
+        processNextHandler();
       }
     });
   }
@@ -112,6 +127,7 @@ export class HomePage implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((contacts) => {
         this.contacts = contacts;
+        this.loadLabels(); // Refresh available labels for tags
         this.updateDisplayedContacts();
       });
   }
@@ -305,8 +321,9 @@ export class HomePage implements OnInit, OnDestroy {
   private async showToast(message: string): Promise<void> {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
-      position: 'bottom'
+      duration: 1500,
+      position: 'middle',
+      cssClass: 'modern-toast'
     });
     await toast.present();
   }

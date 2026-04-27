@@ -31,12 +31,13 @@ export class AppComponent implements OnInit, OnDestroy {
       if (this.platform.is('capacitor')) {
         StatusBar.setStyle({ style: Style.Default });
 
-        // Handle Hardware Back Button Android
-        App.addListener('backButton', ({ canGoBack }) => {
+        // Listen to hardware back button
+        this.platform.backButton.subscribeWithPriority(-1, () => {
           if (this.sidebarOpen) {
             this.closeSidebar();
-          } else if (!canGoBack) {
-            App.exitApp();
+          } else {
+            // Let Ionic handle internal navigation automatically
+            // If we are at the top of the stack, it will exit
           }
         });
       }

@@ -1,23 +1,7 @@
 // Variables
-$primary-color: #427AB5;
-$text-dark: #333;
-$text-light: #999;
-$danger-color: #e74c3c;
-$background-light: #f8f9fa;
+$primary-color: var(--ion-color-primary);
 
-// Search Toolbar
-.search-toolbar {
-  padding: 0;
-  --padding-start: 0;
-  --padding-end: 0;
-
-  ion-searchbar {
-    --padding-start: 0;
-    --padding-end: 0;
-  }
-}
-
-// Empty State
+// Empty State Consistency
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -25,23 +9,26 @@ $background-light: #f8f9fa;
   justify-content: center;
   height: 60vh;
   text-align: center;
-  color: $text-light;
+  padding: 20px;
 
   .empty-icon {
-    font-size: 64px;
-    color: $primary-color;
-    opacity: 0.5;
-    margin-bottom: 16px;
+    font-size: 100px;
+    color: var(--ion-color-medium);
+    margin-bottom: 20px;
+    opacity: 0.2;
   }
 
   p {
-    margin: 8px 0;
-    font-size: 14px;
+    color: var(--ion-color-medium);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
 
-    &.subtitle {
-      color: #bbb;
-      font-size: 12px;
-    }
+  .subtitle {
+    color: var(--ion-color-step-400, #999);
+    font-size: 0.85rem;
+    margin-top: 8px;
   }
 }
 
@@ -56,6 +43,7 @@ $background-light: #f8f9fa;
     margin: 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
+    background: var(--ion-card-background);
 
     .label-content {
       padding: 16px;
@@ -73,12 +61,12 @@ $background-light: #f8f9fa;
         transition: background-color 0.2s ease;
 
         &:hover {
-          background-color: rgba(66, 122, 181, 0.05);
+          background-color: rgba(var(--ion-color-primary-rgb), 0.05);
         }
 
         h3 {
           margin: 0;
-          color: $text-dark;
+          color: var(--ion-text-color);
           font-size: 16px;
           font-weight: 600;
           word-break: break-word;
@@ -86,7 +74,7 @@ $background-light: #f8f9fa;
 
         .label-count {
           margin: 4px 0 0 0;
-          color: $text-light;
+          color: var(--ion-color-medium);
           font-size: 12px;
         }
       }
@@ -96,11 +84,12 @@ $background-light: #f8f9fa;
         --icon-font-size: 20px;
         --padding-start: 8px;
         --padding-end: 8px;
+        color: var(--ion-color-danger);
       }
     }
 
     &:active {
-      background: $background-light;
+      background: var(--ion-color-step-50);
     }
   }
 }

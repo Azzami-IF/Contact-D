@@ -29,6 +29,13 @@ export class ContactAddPage implements OnInit, OnDestroy {
   selectedLabels: Set<string> = new Set();
   selectedLabelsArray: string[] = [];
   availableLabels: string[] = [];
+
+  // Modal States
+  isLabelModalOpen: boolean = false;
+  isInfoModalOpen: boolean = false;
+  labelSearchQuery: string = '';
+  filteredLabels: string[] = [];
+
   private destroy$ = new Subject<void>();
 
   private fieldOptions: FieldOption[] = [
@@ -54,16 +61,13 @@ export class ContactAddPage implements OnInit, OnDestroy {
     });
   }
 
-  openMenu(): void {
-    this.sidebarService.openSidebar();
-  }
-
   ngOnInit() {
     this.loadAvailableLabels();
   }
 
   loadAvailableLabels(): void {
     this.availableLabels = this.labelService.getAllLabels();
+    this.filterLabels();
   }
 
   ngOnDestroy() {
@@ -87,12 +91,18 @@ export class ContactAddPage implements OnInit, OnDestroy {
   // Form Validation
   isFormValid(): boolean {
     const firstName = this.contactForm.get('firstName')?.value?.trim() || '';
-    const lastName = this.contactForm.get('lastName')?.value?.trim() || '';
-    return firstName.length > 0 || lastName.length > 0;
+    return firstName.length > 0;
   }
 
-  // Label Management
-  toggleLabel(label: string): void {
+  // --- LABEL MODAL LOGIC (KEPT) ---
+  filterLabels(): void {
+    const query = this.labelSearchQuery.toLowerCase().trim();
+    this.filteredLabels = this.availableLabels.filter(l =>
+      l.toLowerCase().includes(query)
+    );
+  }
+
+  toggleLabelInModal(label: string): void {
     if (this.selectedLabels.has(label)) {
       this.selectedLabels.delete(label);
     } else {
@@ -101,97 +111,91 @@ export class ContactAddPage implements OnInit, OnDestroy {
     this.updateSelectedLabelsArray();
   }
 
+  createAndAddLabel(): void {
+    const newLabel = this.labelSearchQuery.trim();
+    if (newLabel && !this.availableLabels.includes(newLabel)) {
+      this.availableLabels.push(newLabel);
+      this.availableLabels.sort();
+      this.selectedLabels.add(newLabel);
+      this.updateSelectedLabelsArray();
+      this.labelSearchQuery = '';
+      this.filterLabels();
+    }
+  }
+
+  openLabelModal(): void {
+    this.loadAvailableLabels();
+    this.labelSearchQuery = '';
+    this.filterLabels();
+    this.isLabelModalOpen = true;
+  }
+
+  closeLabelModal(): void {
+    this.isLabelModalOpen = false;
+  }
+
+  openInfoModal(): void {
+    this.isInfoModalOpen = true;
+  }
+
+  closeInfoModal(): void {
+    this.isInfoModalOpen = false;
+  }
+
+  selectInfoType(type: any): void {
+    if (type === 'custom') {
+      this.addCustomField();
+    } else {
+      this.addField(type);
+    }
+    this.closeInfoModal();
+  }
+
   private updateSelectedLabelsArray(): void {
     this.selectedLabelsArray = Array.from(this.selectedLabels);
   }
 
-  hasLabel(label: string): boolean {
-    return this.selectedLabels.has(label);
+  // --- INFO SELECTOR (MODERN CARDS) ---
+  async showAddFieldMenu(): Promise<void> {
+    this.openInfoModal();
   }
 
-  async showLabelSelector(): Promise<void> {
-    const allLabels = this.availableLabels;
-    const inputs = allLabels.map(label => ({
-      name: label,
-      type: 'checkbox',
-      label: label,
-      value: label,
-      checked: this.selectedLabels.has(label),
-    }));
-
-    // Add input untuk custom label
-    const alert = await this.alertController.create({
-      header: 'Pilih Labels',
-      message: 'Centang label yang ingin ditambahkan:',
-      inputs: inputs as any,
-      buttons: [
-        {
-          text: 'Tambah Label Baru',
-          handler: () => {
-            this.addNewLabel();
-          },
-        },
-        {
-          text: 'Batal',
-          role: 'cancel',
-        },
-        {
-          text: 'OK',
-          handler: (data) => {
-            // data adalah array of selected values
-            this.selectedLabels.clear();
-            if (Array.isArray(data)) {
-              data.forEach(label => this.selectedLabels.add(label));
-            }
-            this.updateSelectedLabelsArray();
-          },
-        },
-      ],
+  private addField(type: 'phone' | 'email' | 'address' | 'birthday'): void {
+    this.additionalFields.push({
+      id: Date.now().toString(),
+      type,
+      label: this.getFieldLabel(type),
+      value: '',
     });
-
-    await alert.present();
   }
 
-  private async addNewLabel(): Promise<void> {
+  private async addCustomField(): Promise<void> {
     const alert = await this.alertController.create({
-      header: 'Label Baru',
-      inputs: [
-        {
-          name: 'labelName',
-          type: 'text',
-          placeholder: 'Masukkan nama label baru',
-        },
-      ],
+      header: 'Field Kustom',
+      inputs: [{ name: 'fieldName', type: 'text', placeholder: 'Misal: Jabatan' }],
       buttons: [
-        {
-          text: 'Batal',
-          role: 'cancel',
-        },
+        { text: 'Batal', role: 'cancel' },
         {
           text: 'Tambah',
           handler: (data) => {
-            if (data.labelName && data.labelName.trim()) {
-              const newLabel = data.labelName.trim();
-              if (!this.availableLabels.includes(newLabel)) {
-                this.availableLabels.push(newLabel);
-                this.availableLabels.sort();
-              }
-              this.selectedLabels.add(newLabel);
-              this.updateSelectedLabelsArray();
+            if (data.fieldName?.trim()) {
+              this.additionalFields.push({
+                id: Date.now().toString(),
+                type: 'custom',
+                label: data.fieldName.trim(),
+                value: '',
+                customFieldName: data.fieldName.trim(),
+              });
             }
-          },
-        },
-      ],
+          }
+        }
+      ]
     });
-
     await alert.present();
   }
 
-  // Field Management
   getFieldLabel(type: string, customName?: string): string {
-    if (type === 'custom' && customName) {
-      return customName;
-    }
+    if (type === 'custom' && customName) return customName;
     const option = this.fieldOptions.find(f => f.type === type);
     return option?.label || type;
   }
@@ -201,114 +205,25 @@ export class ContactAddPage implements OnInit, OnDestroy {
     return option?.placeholder || '';
   }
 
-  async showAddFieldMenu(): Promise<void> {
-    const buttons = this.fieldOptions.map(option => ({
-      text: option.label,
-      handler: () => {
-        this.addField(option.type as any);
-      },
-    }));
-
-    // Add "Custom Field" option
-    buttons.push({
-      text: 'Lainnya (Custom)',
-      handler: () => {
-        this.addCustomField();
-      },
-    });
-
-    const alert = await this.alertController.create({
-      header: 'Tambahkan Info Lain',
-      buttons: [
-        ...buttons,
-        {
-          text: 'Batal',
-          role: 'cancel',
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
-  private addField(type: 'phone' | 'email' | 'address' | 'birthday' | 'label'): void {
-    const newField: AdditionalField = {
-      id: Date.now().toString(),
-      type,
-      label: this.getFieldLabel(type),
-      value: '',
-    };
-    this.additionalFields.push(newField);
-  }
-
-  private async addCustomField(): Promise<void> {
-    const alert = await this.alertController.create({
-      header: 'Tambah Field Custom',
-      inputs: [
-        {
-          name: 'fieldName',
-          type: 'text',
-          placeholder: 'Nama field (e.g., Jabatan, Dept)',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Batal',
-          role: 'cancel',
-        },
-        {
-          text: 'Tambah',
-          handler: (data) => {
-            if (data.fieldName && data.fieldName.trim()) {
-              const newField: AdditionalField = {
-                id: Date.now().toString(),
-                type: 'custom',
-                label: data.fieldName,
-                value: '',
-                customFieldName: data.fieldName,
-              };
-              this.additionalFields.push(newField);
-            }
-          },
-        },
-      ],
-    });
-
-    await alert.present();
-  }
-
   removeField(index: number): void {
     this.additionalFields.splice(index, 1);
   }
 
-  // Save Contact
   saveContact(): void {
-    if (!this.isFormValid()) {
-      return;
-    }
-
-    const fieldsWithLabels = [...this.additionalFields];
-
-    // Add selected labels
-    this.selectedLabels.forEach((label, index) => {
-      fieldsWithLabels.push({
-        id: `label-${Date.now()}-${index}`,
-        type: 'label',
-        label: 'Label',
-        value: label,
-      });
+    if (!this.isFormValid()) return;
+    const fields = [...this.additionalFields];
+    this.selectedLabels.forEach((label, i) => {
+      fields.push({ id: `label-${Date.now()}-${i}`, type: 'label', label: 'Label', value: label });
     });
-
     const newContact: Partial<Contact> = {
       firstName: this.contactForm.get('firstName')?.value.trim(),
       lastName: this.contactForm.get('lastName')?.value.trim(),
       company: this.contactForm.get('company')?.value || '',
       notes: this.contactForm.get('notes')?.value || '',
       profileImage: this.profileImageBase64 || undefined,
-      additionalFields: fieldsWithLabels,
+      additionalFields: fields,
       isFavorite: false,
     };
-
     this.contactService.addContact(newContact as Contact);
     this.router.navigate(['/home']);
   }

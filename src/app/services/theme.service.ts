@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Preferences } from '@capacitor/preferences';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -9,14 +10,10 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export class ThemeService {
   private themeSubject = new BehaviorSubject<ThemeMode>('system');
   public theme$ = this.themeSubject.asObservable();
+  private readonly THEME_KEY = 'theme-preference';
 
   constructor() {
-    const savedTheme = localStorage.getItem('theme-preference') as ThemeMode;
-    if (savedTheme) {
-      this.setTheme(savedTheme);
-    } else {
-      this.applyTheme('system');
-    }
+    this.initTheme();
 
     // Listen to system changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
@@ -26,8 +23,17 @@ export class ThemeService {
     });
   }
 
-  setTheme(mode: ThemeMode) {
-    localStorage.setItem('theme-preference', mode);
+  private async initTheme() {
+    const { value } = await Preferences.get({ key: this.THEME_KEY });
+    if (value) {
+      this.setTheme(value as ThemeMode);
+    } else {
+      this.applyTheme('system');
+    }
+  }
+
+  async setTheme(mode: ThemeMode) {
+    await Preferences.set({ key: this.THEME_KEY, value: mode });
     this.themeSubject.next(mode);
     this.applyTheme(mode);
   }

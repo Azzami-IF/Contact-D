@@ -1,10 +1,7 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'/contact-detail/' + contactId" color="light"></ion-back-button>
-      <ion-button (click)="openMenu()" fill="clear" color="light">
-        <ion-icon slot="icon-only" name="menu"></ion-icon>
-      </ion-button>
     </ion-buttons>
     <ion-title>Edit Kontak</ion-title>
   </ion-toolbar>
@@ -15,27 +12,13 @@
     <!-- Profile Picture Section -->
     <div class="profile-section">
       <div class="profile-image">
-        <img
-          *ngIf="profileImageUrl"
-          [src]="profileImageUrl"
-          alt="Profile"
-        >
+        <img *ngIf="profileImageUrl" [src]="profileImageUrl" alt="Profile">
         <div *ngIf="!profileImageUrl" class="placeholder">
           <ion-icon name="camera"></ion-icon>
         </div>
       </div>
-      <input
-        #fileInput
-        type="file"
-        accept="image/*"
-        (change)="onImageSelected($event)"
-        hidden
-      >
-      <button
-        type="button"
-        class="upload-btn"
-        (click)="fileInput.click()"
-      >
+      <input #fileInput type="file" accept="image/*" (change)="onImageSelected($event)" hidden>
+      <button type="button" class="upload-btn" (click)="fileInput.click()">
         <ion-icon name="camera"></ion-icon>
         Ubah Foto
       </button>
@@ -47,83 +30,22 @@
         <ion-card-title>Informasi Dasar</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-
-        <!-- First Name -->
-        <ion-item>
-          <ion-label position="stacked"><strong>Nama Depan *</strong></ion-label>
-          <ion-input
-            type="text"
-            formControlName="firstName"
-            placeholder="Masukkan nama depan"
-            clearInput="true"
-          ></ion-input>
+        <ion-item lines="full">
+          <ion-label position="stacked">Nama Depan *</ion-label>
+          <ion-input type="text" formControlName="firstName" placeholder="Masukkan nama depan" clearInput="true"></ion-input>
         </ion-item>
-
-        <!-- Last Name -->
-        <ion-item>
-          <ion-label position="stacked"><strong>Nama Belakang *</strong></ion-label>
-          <ion-input
-            type="text"
-            formControlName="lastName"
-            placeholder="Masukkan nama belakang"
-            clearInput="true"
-          ></ion-input>
+        <ion-item lines="full">
+          <ion-label position="stacked">Nama Belakang</ion-label>
+          <ion-input type="text" formControlName="lastName" placeholder="Masukkan nama belakang" clearInput="true"></ion-input>
         </ion-item>
-
-        <!-- Company -->
-        <ion-item>
-          <ion-label position="stacked"><strong>Perusahaan (Opsional)</strong></ion-label>
-          <ion-input
-            type="text"
-            formControlName="company"
-            placeholder="Nama perusahaan"
-            clearInput="true"
-          ></ion-input>
+        <ion-item lines="full">
+          <ion-label position="stacked">Perusahaan</ion-label>
+          <ion-input type="text" formControlName="company" placeholder="Nama perusahaan (opsional)" clearInput="true"></ion-input>
         </ion-item>
-
-        <!-- Notes -->
-        <ion-item>
-          <ion-label position="stacked"><strong>Catatan (Opsional)</strong></ion-label>
-          <ion-textarea
-            formControlName="notes"
-            placeholder="Tambahkan catatan tentang kontak ini"
-            rows="3"
-          ></ion-textarea>
+        <ion-item lines="none">
+          <ion-label position="stacked">Catatan</ion-label>
+          <ion-textarea formControlName="notes" placeholder="Tambahkan catatan... (opsional)" rows="2"></ion-textarea>
         </ion-item>
-
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Labels Section -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Labels</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="selected-labels">
-          <ion-chip
-            *ngFor="let label of selectedLabelsArray"
-            color="primary"
-            outline="false"
-          >
-            <ion-label>{{ label }}</ion-label>
-            <ion-icon
-              name="close-circle"
-              (click)="toggleLabel(label)"
-              class="remove-label"
-            ></ion-icon>
-          </ion-chip>
-        </div>
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="primary"
-          (click)="showLabelSelector()"
-          class="label-selector-btn"
-        >
-          <ion-icon name="pricetag" slot="start"></ion-icon>
-          {{ selectedLabelsArray.length > 0 ? 'Ubah Labels' : 'Tambah Labels' }}
-        </ion-button>
       </ion-card-content>
     </ion-card>
 
@@ -133,84 +55,139 @@
         <ion-card-title>Informasi Tambahan</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-
-        <div
-          *ngFor="let field of additionalFields; let i = index"
-          class="field-wrapper"
-        >
+        <div *ngFor="let field of additionalFields; let i = index" class="field-wrapper">
           <div class="field-row">
-            <ion-item>
-              <ion-label position="stacked">
-                <strong>{{ getFieldLabel(field.type, field.customFieldName) }}</strong>
-              </ion-label>
-
-              <!-- Text Input -->
-              <ion-input
-                *ngIf="field.type !== 'birthday'"
-                type="text"
-                [(ngModel)]="field.value"
-                [placeholder]="getFieldPlaceholder(field.type)"
-                clearInput="true"
-              ></ion-input>
-
-              <!-- Birthday Input -->
-              <ion-input
-                *ngIf="field.type === 'birthday'"
-                type="date"
-                [(ngModel)]="field.value"
-              ></ion-input>
+            <ion-item lines="full" class="ion-no-padding">
+              <ion-label position="stacked">{{ getFieldLabel(field.type, field.customFieldName) }}</ion-label>
+              <ion-input *ngIf="field.type !== 'birthday'" type="text" [(ngModel)]="field.value" [ngModelOptions]="{standalone: true}" [placeholder]="getFieldPlaceholder(field.type)" clearInput="true"></ion-input>
+              <ion-input *ngIf="field.type === 'birthday'" type="date" [(ngModel)]="field.value" [ngModelOptions]="{standalone: true}"></ion-input>
             </ion-item>
-
-            <!-- Delete Button -->
-            <button
-              type="button"
-              class="delete-field-btn"
-              (click)="removeField(i)"
-              title="Hapus field ini"
-            >
-              <ion-icon name="remove-circle"></ion-icon>
-            </button>
+            <ion-button fill="clear" color="danger" (click)="removeField(i)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
           </div>
         </div>
-
       </ion-card-content>
     </ion-card>
 
-    <!-- Add More Fields Button -->
+    <!-- Add Info Button -->
     <ion-card>
       <ion-card-content>
-        <ion-button
-          expand="block"
-          fill="outline"
-          color="primary"
-          (click)="showAddFieldMenu()"
-        >
-          <ion-icon name="add-circle" slot="start"></ion-icon>
+        <ion-button expand="block" fill="outline" color="primary" (click)="openInfoModal()">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
           Tambahkan Info Lain
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Labels Display -->
+    <ion-card *ngIf="selectedLabelsArray.length > 0">
+      <ion-card-header>
+        <ion-card-title>Labels</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="selected-labels">
+          <ion-chip *ngFor="let label of selectedLabelsArray" color="primary">
+            <ion-label>{{ label }}</ion-label>
+            <ion-icon name="close-circle" (click)="toggleLabelInModal(label)"></ion-icon>
+          </ion-chip>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Label Selector Button -->
+    <ion-card>
+      <ion-card-content>
+        <ion-button expand="block" fill="outline" color="primary" (click)="openLabelModal()">
+          <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+          {{ selectedLabelsArray.length > 0 ? 'Ubah Labels' : 'Tambah Labels' }}
         </ion-button>
       </ion-card-content>
     </ion-card>
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <ion-button
-        expand="block"
-        color="primary"
-        (click)="updateContact()"
-        [disabled]="!isFormValid()"
-      >
-        <ion-icon name="save" slot="start"></ion-icon>
+      <ion-button expand="block" color="primary" (click)="updateContact()" [disabled]="!isFormValid()">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
         Simpan Perubahan
       </ion-button>
-      <ion-button
-        expand="block"
-        color="medium"
-        (click)="cancel()"
-      >
-        <ion-icon name="close" slot="start"></ion-icon>
+      <ion-button expand="block" color="medium" (click)="cancel()">
         Batal
       </ion-button>
     </div>
-
   </form>
+
+  <!-- Modern Label Selector Modal -->
+  <ion-modal [isOpen]="isLabelModalOpen" (didDismiss)="closeLabelModal()" [initialBreakpoint]="0.6" [breakpoints]="[0, 0.6, 0.9]">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="primary">
+          <ion-title>Pilih Labels</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeLabelModal()" color="light">Selesai</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+        <ion-toolbar color="primary">
+          <ion-searchbar [(ngModel)]="labelSearchQuery" placeholder="Cari atau buat label..." (ionChange)="filterLabels()" class="header-searchbar"></ion-searchbar>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list lines="full">
+          <ion-item button (click)="createAndAddLabel()" *ngIf="labelSearchQuery.trim() && !availableLabels.includes(labelSearchQuery.trim())">
+            <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Buat Label: "<strong>{{ labelSearchQuery }}</strong>"</ion-label>
+          </ion-item>
+          <ion-item button *ngFor="let label of filteredLabels" (click)="toggleLabelInModal(label)">
+            <ion-icon name="pricetag-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>{{ label }}</ion-label>
+            <ion-checkbox slot="end" [checked]="selectedLabels.has(label)"></ion-checkbox>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modern Info Type Selector Modal (Stacked Card-Style List) -->
+  <ion-modal [isOpen]="isInfoModalOpen" (didDismiss)="closeInfoModal()" [initialBreakpoint]="0.6" [breakpoints]="[0, 0.6, 0.8]">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="primary">
+          <ion-title>Pilih Informasi</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeInfoModal()" color="light">Tutup</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list lines="none">
+          <ion-item button (click)="selectInfoType('phone')" class="selector-item">
+            <ion-icon name="call-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Telepon</ion-label>
+          </ion-item>
+          <ion-item button (click)="selectInfoType('email')" class="selector-item">
+            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Email</ion-label>
+          </ion-item>
+          <ion-item button (click)="selectInfoType('address')" class="selector-item">
+            <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Alamat</ion-label>
+          </ion-item>
+          <ion-item button (click)="selectInfoType('birthday')" class="selector-item">
+            <ion-icon name="calendar-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Ulang Tahun</ion-label>
+          </ion-item>
+          <ion-item button (click)="selectInfoType('custom')" class="selector-item">
+            <ion-icon name="options-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>Kustom (Lainnya)</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <!-- Opsi Batal (Simpel) -->
+        <ion-button expand="block" fill="clear" color="medium" (click)="closeInfoModal()" class="ion-margin-top">
+          Batal
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

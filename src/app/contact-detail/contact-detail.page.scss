@@ -6,6 +6,9 @@
 .profile-card {
   margin: 16px;
   text-align: center;
+  background: var(--ion-card-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
   .profile-content {
     padding: 24px 16px;
@@ -62,6 +65,7 @@
   --color: var(--ion-color-primary);
   font-weight: 600;
   height: 32px;
+  margin: 0;
 
   ion-icon {
     font-size: 14px;
@@ -79,13 +83,22 @@
   }
 }
 
-ion-card-content {
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
+ion-card {
+  margin: 16px;
+  background: var(--ion-card-background);
+  border-radius: 12px;
 
-    ion-text {
-      font-size: 0.95rem;
-    }
+  ion-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ion-color-primary);
+  }
+}
+
+body.dark {
+  .profile-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }

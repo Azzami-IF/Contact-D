@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "id.ac.uts.contactapp"
+    namespace = "com.contact_d.ambatu"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "id.ac.uts.contactapp"
+        applicationId "com.contact_d.ambatu"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

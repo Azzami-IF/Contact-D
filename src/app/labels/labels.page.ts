@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LabelService } from '../services/label.service';
+import { ContactService } from '../services/contact.service';
 import { SidebarService } from '../services/sidebar.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -26,6 +27,7 @@ export class LabelsPage implements OnInit, OnDestroy {
 
   constructor(
     private labelService: LabelService,
+    private contactService: ContactService,
     private router: Router,
     private alertController: AlertController,
     private sidebarService: SidebarService
@@ -36,16 +38,16 @@ export class LabelsPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadLabels();
+    this.contactService.contacts$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateLabels();
+      });
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  loadLabels(): void {
-    this.updateLabels();
   }
 
   toggleSearchBar(): void {

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ContactService } from './contact.service';
-import { ToastController } from '@ionic/angular';
+import { ToastController, Platform } from '@ionic/angular';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 @Injectable({
   providedIn: 'root'
@@ -9,21 +11,46 @@ export class ImportExportService {
 
   constructor(
     private contactService: ContactService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private platform: Platform
   ) { }
 
   async exportContacts() {
     const contacts = this.contactService.getContacts();
     const dataStr = JSON.stringify(contacts, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-
     const fileName = `contacts_backup_${new Date().getTime()}.json`;
-    const link = document.createElement('a');
-    link.setAttribute('href', dataUri);
-    link.setAttribute('download', fileName);
-    link.click();
 
-    await this.showToast('Data kontak berhasil dieksport');
+    if (this.platform.is('capacitor')) {
+      try {
+        // 1. Write file to temporary directory on Android
+        const result = await Filesystem.writeFile({
+          path: fileName,
+          data: dataStr,
+          directory: Directory.Cache,
+          encoding: Encoding.UTF8,
+        });
+
+        // 2. Open Android Share Sheet so user can save it to "Downloads" or send via WA/Email
+        await Share.share({
+          title: 'Export Kontak',
+          text: 'Cadangan data kontak Anda',
+          url: result.uri,
+          dialogTitle: 'Simpan file cadangan ke...',
+        });
+
+      } catch (error) {
+        console.error('Export error:', error);
+        await this.showToast('Gagal mengeksport data');
+      }
+    } else {
+      // Browser fallback (Old method)
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const link = document.createElement('a');
+      link.setAttribute('href', dataUri);
+      link.setAttribute('download', fileName);
+      link.click();
+      await this.showToast('Data kontak berhasil dieksport');
+    }
   }
 
   async importContacts(file: File) {
@@ -32,11 +59,9 @@ export class ImportExportService {
       const contacts = JSON.parse(text);
 
       if (Array.isArray(contacts)) {
-        // Simple validation: check if items have firstName
         const isValid = contacts.every(c => c.firstName !== undefined);
         if (!isValid) throw new Error('Format file tidak valid');
 
-        // Overwrite or Merge? Let's overwrite for simplicity or merge based on ID
         const existingContacts = this.contactService.getContacts();
         const merged = [...existingContacts];
 
@@ -49,12 +74,7 @@ export class ImportExportService {
           }
         });
 
-        localStorage.setItem('contacts', JSON.stringify(merged));
-        // Force reload contacts in service if needed, or just use service method
-        // Since ContactService uses BehaviorSubject, we should update it
-        // Actually it's better if ContactService has a setContacts method
         this.contactService.importContactsData(merged);
-
         await this.showToast('Data kontak berhasil diimport');
         return true;
       }
@@ -68,8 +88,9 @@ export class ImportExportService {
   private async showToast(message: string) {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
-      position: 'bottom'
+      duration: 1500,
+      position: 'middle',
+      cssClass: 'modern-toast'
     });
     await toast.present();
   }
