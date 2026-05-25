@@ -29,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   initializeApp() {
     this.platform.ready().then(() => {
       if (this.platform.is('capacitor')) {
-        StatusBar.setStyle({ style: Style.Default });
+        // StatusBar style is now handled by Edge-to-Edge and System settings in Android 15+
 
         // Listen to hardware back button
         this.platform.backButton.subscribeWithPriority(-1, () => {

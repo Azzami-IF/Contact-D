@@ -84,11 +84,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.availableLabels = this.labelService.getAllLabels();
   }
 
-  onLabelFilterChange(event: any): void {
-    // This was for the old select, can be removed or kept if needed.
-    // Let's remove it in the HTML later.
-  }
-
   setLabelFilter(label: string): void {
     if (label === '') {
       this.activeFilters = [];
