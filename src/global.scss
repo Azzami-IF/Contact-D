@@ -119,6 +119,16 @@ ion-content {
   --background: var(--ion-background-color);
 }
 
+ion-header {
+  // Biarkan toolbar di dalamnya yang menangani background dan padding
+  background: transparent !important;
+}
+
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast, white);
+}
+
 ion-header.ion-no-border {
   border: none;
 }

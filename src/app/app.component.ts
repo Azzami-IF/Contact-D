@@ -4,7 +4,6 @@ import { SidebarService } from './services/sidebar.service';
 import { ThemeService } from './services/theme.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { StatusBar, Style } from '@capacitor/status-bar';
 import { App } from '@capacitor/app';
 
 @Component({

@@ -4,6 +4,11 @@ import { ToastController, Platform } from '@ionic/angular';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
+export interface ImportResult {
+  contacts: any[];
+  exportDate?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,8 +22,20 @@ export class ImportExportService {
 
   async exportContacts() {
     const contacts = this.contactService.getContacts();
-    const dataStr = JSON.stringify(contacts, null, 2);
-    const fileName = `contacts_backup_${new Date().getTime()}.json`;
+    const now = new Date();
+
+    // New format with metadata
+    const exportData = {
+      version: '1.0',
+      exportDate: now.toISOString(),
+      contacts: contacts
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+
+    // Formatted filename: contacts_backup_YYYY-MM-DD.json
+    const dateStr = now.toISOString().split('T')[0];
+    const fileName = `contacts_backup_${dateStr}.json`;
 
     if (this.platform.is('capacitor')) {
       try {
@@ -53,34 +70,61 @@ export class ImportExportService {
     }
   }
 
-  async importContacts(file: File) {
+  /**
+   * Parses the file and returns the data without applying it.
+   * This allows the UI to show a confirmation dialog first.
+   */
+  async prepareImport(file: File): Promise<ImportResult | null> {
     try {
       const text = await file.text();
-      const contacts = JSON.parse(text);
+      const rawData = JSON.parse(text);
 
-      if (Array.isArray(contacts)) {
-        const isValid = contacts.every(c => c.firstName !== undefined);
-        if (!isValid) throw new Error('Format file tidak valid');
+      let contacts: any[] = [];
+      let exportDate: string | undefined;
 
-        const existingContacts = this.contactService.getContacts();
-        const merged = [...existingContacts];
-
-        contacts.forEach(newContact => {
-          const index = merged.findIndex(c => c.id === newContact.id);
-          if (index > -1) {
-            merged[index] = newContact;
-          } else {
-            merged.push(newContact);
-          }
-        });
-
-        this.contactService.importContactsData(merged);
-        await this.showToast('Data kontak berhasil diimport');
-        return true;
+      // Check if it's the new format (object) or old format (array)
+      if (rawData && typeof rawData === 'object' && !Array.isArray(rawData)) {
+        if (Array.isArray(rawData.contacts)) {
+          contacts = rawData.contacts;
+          exportDate = rawData.exportDate;
+        } else {
+          throw new Error('Format file tidak dikenali');
+        }
+      } else if (Array.isArray(rawData)) {
+        contacts = rawData;
+      } else {
+        throw new Error('Format file tidak valid');
       }
-      return false;
+
+      const isValid = contacts.length === 0 || contacts.every(c => c.firstName !== undefined);
+      if (!isValid) throw new Error('Data kontak tidak valid');
+
+      return { contacts, exportDate };
     } catch (error) {
-      await this.showToast('Gagal mengimport data: ' + (error as Error).message);
+      await this.showToast('Gagal membaca file: ' + (error as Error).message);
+      return null;
+    }
+  }
+
+  async executeImport(contacts: any[]) {
+    try {
+      const existingContacts = this.contactService.getContacts();
+      const merged = [...existingContacts];
+
+      contacts.forEach(newContact => {
+        const index = merged.findIndex(c => c.id === newContact.id);
+        if (index > -1) {
+          merged[index] = newContact;
+        } else {
+          merged.push(newContact);
+        }
+      });
+
+      this.contactService.importContactsData(merged);
+      await this.showToast('Data kontak berhasil diimport');
+      return true;
+    } catch (error) {
+      await this.showToast('Gagal mengimport data');
       return false;
     }
   }
