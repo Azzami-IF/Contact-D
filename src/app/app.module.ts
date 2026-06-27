@@ -9,7 +9,18 @@ import { AppRoutingModule } from './app-routing.module';
 
 const customAnimation = (_: HTMLElement, opts: any) => {
   const isBack = opts.direction === 'back';
+  const isForward = opts.direction === 'forward';
 
+  // For root navigation (like from side menu), use a smooth fade instead of slide
+  if (!isBack && !isForward) {
+    return createAnimation()
+      .addElement(opts.enteringEl)
+      .duration(200)
+      .easing('ease-in-out')
+      .fromTo('opacity', '0', '1');
+  }
+
+  // For hierarchical navigation (forward/back), use horizontal slide
   const enteringAnimation = createAnimation()
     .addElement(opts.enteringEl)
     .fromTo('transform', isBack ? 'translateX(-100%)' : 'translateX(100%)', 'translateX(0)')

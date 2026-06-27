@@ -120,10 +120,72 @@
     <p class="subtitle">Tekan tombol + untuk menambah kontak baru</p>
   </div>
 
-  <!-- Contacts List -->
-  <ion-list *ngIf="displayedContacts.length > 0" class="contacts-list">
+  <!-- Grouped Contacts List (Only for Name-based Sorting) -->
+  <ion-list *ngIf="displayedContacts.length > 0 && (currentSort === 'name-asc' || currentSort === 'name-desc')" class="contacts-list">
+    <ion-item-group *ngFor="let group of getGroupedContacts()">
+      <ion-item-divider sticky="true">
+        <ion-label>{{ group.letter }}</ion-label>
+      </ion-item-divider>
+
+      <ion-item
+        *ngFor="let contact of group.contacts; trackBy: trackByFn"
+        (click)="onItemClick(contact)"
+        (mousedown)="startPress(contact.id)"
+        (mouseup)="endPress()"
+        (touchstart)="startPress(contact.id)"
+        (touchend)="endPress()"
+        class="contact-item"
+        [class.selected-item]="isSelected(contact.id)"
+      >
+        <ion-checkbox
+          *ngIf="isSelectionMode"
+          slot="start"
+          [checked]="isSelected(contact.id)"
+          (click)="$event.stopPropagation()"
+          (ionChange)="toggleSelection(contact.id)"
+        ></ion-checkbox>
+
+        <ion-avatar slot="start" class="contact-avatar">
+          <img
+            *ngIf="contact.profileImage"
+            [src]="contact.profileImage"
+            alt="Profile"
+          >
+          <div *ngIf="!contact.profileImage" class="avatar-placeholder">
+            {{ (contact.firstName.charAt(0) + (contact.lastName?.charAt(0) || '')) | uppercase }}
+          </div>
+        </ion-avatar>
+
+        <ion-label>
+          <h2 class="contact-name">{{ contact.firstName }} {{ contact.lastName }}</h2>
+          <p *ngIf="contact.company" class="contact-company">{{ contact.company }}</p>
+          <div class="contact-labels" *ngIf="(contact | extractLabels).length > 0">
+            <ion-chip
+              *ngFor="let label of (contact | extractLabels)"
+              size="small"
+              class="label-chip"
+            >
+              {{ label }}
+            </ion-chip>
+          </div>
+        </ion-label>
+
+        <ion-icon
+          *ngIf="!isSelectionMode"
+          slot="end"
+          [name]="contact.isFavorite ? 'star' : 'star-outline'"
+          [color]="contact.isFavorite ? 'warning' : 'medium'"
+          (click)="toggleFavorite($event, contact.id)"
+          class="favorite-icon"
+        ></ion-icon>
+      </ion-item>
+    </ion-item-group>
+  </ion-list>
+
+  <!-- Flat Contacts List (For Date-based Sorting or Search) -->
+  <ion-list *ngIf="displayedContacts.length > 0 && (currentSort === 'date-asc' || currentSort === 'date-desc')" class="contacts-list">
     <ion-item
-      *ngFor="let contact of displayedContacts"
+      *ngFor="let contact of displayedContacts; trackBy: trackByFn"
       (click)="onItemClick(contact)"
       (mousedown)="startPress(contact.id)"
       (mouseup)="endPress()"
@@ -147,16 +209,16 @@
           alt="Profile"
         >
         <div *ngIf="!contact.profileImage" class="avatar-placeholder">
-          {{ (contact.firstName.charAt(0) + contact.lastName.charAt(0)) | uppercase }}
+          {{ (contact.firstName.charAt(0) + (contact.lastName?.charAt(0) || '')) | uppercase }}
         </div>
       </ion-avatar>
 
       <ion-label>
         <h2 class="contact-name">{{ contact.firstName }} {{ contact.lastName }}</h2>
         <p *ngIf="contact.company" class="contact-company">{{ contact.company }}</p>
-        <div class="contact-labels" *ngIf="getLabelsForContact(contact.id).length > 0">
+        <div class="contact-labels" *ngIf="(contact | extractLabels).length > 0">
           <ion-chip
-            *ngFor="let label of getLabelsForContact(contact.id)"
+            *ngFor="let label of (contact | extractLabels)"
             size="small"
             class="label-chip"
           >

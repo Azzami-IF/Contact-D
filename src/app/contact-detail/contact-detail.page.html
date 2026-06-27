@@ -38,20 +38,24 @@
             {{ contact.firstName.charAt(0) }}{{ contact.lastName.charAt(0) }}
           </div>
         </div>
-        <h1>{{ contact.firstName }} {{ contact.lastName }}</h1>
-        <p *ngIf="contact.company" class="company">{{ contact.company }}</p>
+        <h1 appLongPress (longPress)="copyToClipboard(contact.firstName + ' ' + contact.lastName)">
+          {{ contact.firstName }} {{ contact.lastName }}
+        </h1>
+        <p *ngIf="contact.company" class="company" appLongPress (longPress)="copyToClipboard(contact.company)">
+          {{ contact.company }}
+        </p>
       </ion-card-content>
     </ion-card>
 
     <!-- Labels -->
-    <ion-card *ngIf="getLabelsForContact(contact.id).length > 0">
+    <ion-card *ngIf="(contact | extractLabels).length > 0">
       <ion-card-header>
         <ion-card-title>Labels</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <div class="label-container">
           <ion-chip
-            *ngFor="let label of getLabelsForContact(contact.id)"
+            *ngFor="let label of (contact | extractLabels)"
             color="primary"
             outline="false"
             class="detail-label-chip"
@@ -70,7 +74,7 @@
         <ion-card-title>Catatan</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item lines="none">
+        <ion-item lines="none" appLongPress (longPress)="copyToClipboard(contact.notes)">
           <ion-text>{{ contact.notes }}</ion-text>
         </ion-item>
       </ion-card-content>
@@ -82,12 +86,19 @@
         <ion-card-title>Informasi Lainnya</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item lines="none" *ngFor="let field of getAdditionalFieldsWithoutLabels()">
+        <ion-item lines="none" *ngFor="let field of getAdditionalFieldsWithoutLabels()" appLongPress (longPress)="copyToClipboard(field.value)">
           <ion-icon [name]="getFieldIcon(field)" slot="start" color="primary"></ion-icon>
           <ion-label position="stacked">
             <strong>{{ getFieldLabel(field) }}</strong>
           </ion-label>
-          <ion-text>{{ field.value }}</ion-text>
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <ion-text>{{ field.value }}</ion-text>
+            <div *ngIf="field.type === 'phone' || field.type === 'email'">
+              <ion-button fill="clear" size="small" [href]="getActionUrl(field)">
+                <ion-icon [name]="field.type === 'phone' ? 'call-outline' : 'mail-outline'" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
         </ion-item>
       </ion-card-content>
     </ion-card>

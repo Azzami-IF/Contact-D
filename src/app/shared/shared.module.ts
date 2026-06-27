@@ -4,12 +4,10 @@ import { ExtractLabelsPipe } from '../pipes/extract-labels.pipe';
 import { LongPressDirective } from '../directives/long-press.directive';
 
 @NgModule({
-  declarations: [
+  imports: [
+    CommonModule,
     ExtractLabelsPipe,
     LongPressDirective
-  ],
-  imports: [
-    CommonModule
   ],
   exports: [
     ExtractLabelsPipe,

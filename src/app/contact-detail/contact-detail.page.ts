@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Contact, AdditionalField } from '../models/contact.model';
 import { ContactService } from '../services/contact.service';
 import { LabelService } from '../services/label.service';
 import { SidebarService } from '../services/sidebar.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Clipboard } from '@capacitor/clipboard';
 
 @Component({
   selector: 'app-contact-detail',
@@ -19,14 +20,15 @@ export class ContactDetailPage implements OnInit, OnDestroy {
   contactId: string | null = null;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private contactService: ContactService,
-    private labelService: LabelService,
-    private alertController: AlertController,
-    private sidebarService: SidebarService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private contactService = inject(ContactService);
+  private labelService = inject(LabelService);
+  private alertController = inject(AlertController);
+  private sidebarService = inject(SidebarService);
+  private toastController = inject(ToastController);
+
+  constructor() {}
 
   openMenu(): void {
     this.sidebarService.openSidebar();
@@ -99,6 +101,15 @@ export class ContactDetailPage implements OnInit, OnDestroy {
     }
   }
 
+  getActionUrl(field: AdditionalField): string {
+    if (field.type === 'phone') {
+      return `tel:${field.value}`;
+    } else if (field.type === 'email') {
+      return `mailto:${field.value}`;
+    }
+    return '#';
+  }
+
   editContact(): void {
     if (this.contactId) {
       this.router.navigate(['/contact-edit', this.contactId]);
@@ -106,12 +117,25 @@ export class ContactDetailPage implements OnInit, OnDestroy {
   }
 
   // Helper Methods
-  getLabelsForContact(contactId: string): string[] {
-    return this.labelService.getContactLabels(contactId);
-  }
-
   getAdditionalFieldsWithoutLabels(): AdditionalField[] {
     return this.contact?.additionalFields.filter(field => field.type !== 'label') || [];
+  }
+
+  async copyToClipboard(text: string): Promise<void> {
+    if (!text) return;
+
+    await Clipboard.write({
+      string: text
+    });
+
+    const toast = await this.toastController.create({
+      message: 'Teks telah dicopy!',
+      duration: 2000,
+      position: 'bottom',
+      color: 'dark',
+      cssClass: 'modern-toast'
+    });
+    await toast.present();
   }
 
   async deleteContact(): Promise<void> {

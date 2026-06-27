@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, ToastController, Platform } from '@ionic/angular';
 import { Contact, SortBy } from '../models/contact.model';
@@ -45,20 +45,25 @@ export class HomePage implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private contactService: ContactService,
-    private labelService: LabelService,
-    private router: Router,
-    private sidebarService: SidebarService,
-    private alertController: AlertController,
-    private toastController: ToastController,
-    private platform: Platform
-  ) {}
+  private contactService = inject(ContactService);
+  private labelService = inject(LabelService);
+  private router = inject(Router);
+  private sidebarService = inject(SidebarService);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
+  private platform = inject(Platform);
+
+  constructor() {}
 
   ngOnInit() {
-    this.loadContacts();
-    this.loadLabels();
     this.setupAndroidBackButton();
+    this.loadContacts();
+  }
+
+  ionViewWillEnter() {
+    // Refresh labels and displayed contacts whenever the view is about to enter
+    this.loadLabels();
+    this.updateDisplayedContacts();
   }
 
   setupAndroidBackButton() {
@@ -159,13 +164,6 @@ export class HomePage implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     this.contactService.toggleFavorite(contactId);
-  }
-
-  // Helper Methods
-  getLabelsForContact(contactId: string): string[] {
-    const contact = this.contacts.find(c => c.id === contactId);
-    if (!contact) return [];
-    return this.labelService.getContactLabels(contactId);
   }
 
   // Multi-select methods
@@ -388,5 +386,33 @@ export class HomePage implements OnInit, OnDestroy {
     }
 
     this.displayedContacts = filtered;
+  }
+
+  getGroupedContacts() {
+    const groups: { letter: string; contacts: Contact[] }[] = [];
+
+    this.displayedContacts.forEach(contact => {
+      const firstLetter = contact.firstName ? contact.firstName.charAt(0).toUpperCase() : '#';
+      let group = groups.find(g => g.letter === firstLetter);
+
+      if (!group) {
+        group = { letter: firstLetter, contacts: [] };
+        groups.push(group);
+      }
+
+      group.contacts.push(contact);
+    });
+
+    // Sort groups based on the current name sort preference
+    return groups.sort((a, b) => {
+      if (this.currentSort === 'name-desc') {
+        return b.letter.localeCompare(a.letter);
+      }
+      return a.letter.localeCompare(b.letter);
+    });
+  }
+
+  trackByFn(index: number, item: Contact): string {
+    return item.id;
   }
 }

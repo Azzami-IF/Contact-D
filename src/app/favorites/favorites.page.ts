@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Contact, SortBy } from '../models/contact.model';
 import { ContactService } from '../services/contact.service';
@@ -22,12 +22,12 @@ export class FavoritesPage implements OnInit, OnDestroy {
   currentSort: SortBy = 'name-asc';
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private contactService: ContactService,
-    private labelService: LabelService,
-    private router: Router,
-    private sidebarService: SidebarService
-  ) {}
+  private contactService = inject(ContactService);
+  private labelService = inject(LabelService);
+  private router = inject(Router);
+  private sidebarService = inject(SidebarService);
+
+  constructor() {}
 
   openMenu(): void {
     this.sidebarService.openSidebar();

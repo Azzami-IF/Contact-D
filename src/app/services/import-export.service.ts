@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ContactService } from './contact.service';
 import { ToastController, Platform } from '@ionic/angular';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
@@ -14,11 +14,11 @@ export interface ImportResult {
 })
 export class ImportExportService {
 
-  constructor(
-    private contactService: ContactService,
-    private toastController: ToastController,
-    private platform: Platform
-  ) { }
+  private contactService = inject(ContactService);
+  private toastController = inject(ToastController);
+  private platform = inject(Platform);
+
+  constructor() { }
 
   async exportContacts() {
     const contacts = this.contactService.getContacts();

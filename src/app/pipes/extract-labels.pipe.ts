@@ -3,7 +3,8 @@ import { Contact } from '../models/contact.model';
 
 @Pipe({
   name: 'extractLabels',
-  pure: true
+  pure: true,
+  standalone: true
 })
 export class ExtractLabelsPipe implements PipeTransform {
   transform(contact: Contact): string[] {

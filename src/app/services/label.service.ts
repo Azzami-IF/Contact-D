@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ContactService } from './contact.service';
 import { Contact } from '../models/contact.model';
 
@@ -12,7 +12,9 @@ export interface LabelInfo {
   providedIn: 'root',
 })
 export class LabelService {
-  constructor(private contactService: ContactService) {}
+  private contactService = inject(ContactService);
+
+  constructor() {}
 
   /**
    * Get all unique labels from all contacts

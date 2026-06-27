@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LabelService } from '../services/label.service';
@@ -25,13 +25,13 @@ export class LabelsPage implements OnInit, OnDestroy {
   showSearchBar: boolean = false;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private labelService: LabelService,
-    private contactService: ContactService,
-    private router: Router,
-    private alertController: AlertController,
-    private sidebarService: SidebarService
-  ) {}
+  private labelService = inject(LabelService);
+  private contactService = inject(ContactService);
+  private router = inject(Router);
+  private alertController = inject(AlertController);
+  private sidebarService = inject(SidebarService);
+
+  constructor() {}
 
   openMenu(): void {
     this.sidebarService.openSidebar();

@@ -12,16 +12,21 @@
 #   public *;
 #}
 
-# Preserve line number information for debugging stack traces.
--keepattributes SourceFile,LineNumberTable
--keepattributes *Annotation*
--keepattributes Signature
+# Uncomment this to preserve the line number information for
+# debugging stack traces.
+#-keepattributes SourceFile,LineNumberTable
 
-# Capacitor and Cordova essentials
--keep public class com.getcapacitor.** { *; }
--keep public class com.getcapacitor.Bridge { *; }
--keep public class * extends com.getcapacitor.Plugin { *; }
--keep public class * extends com.getcapacitor.BridgeActivity { *; }
+# If you keep the line number information, uncomment this to
+# hide the original source file name.
+#-renamesourcefileattribute SourceFile
 
-# Preserve source file name for crash reporting
--renamesourcefileattribute SourceFile
+# Capacitor rules
+-keep class com.getcapacitor.** { *; }
+-keep @interface com.getcapacitor.** { *; }
+-keep class * extends com.getcapacitor.Plugin { *; }
+-keep class * extends com.getcapacitor.BridgeActivity { *; }
+
+# Prevent shrinking of important assets
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}

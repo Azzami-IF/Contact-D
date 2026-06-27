@@ -176,3 +176,20 @@ $primary-color: var(--ion-color-primary);
     }
   }
 }
+
+// Improved Divider for Dark/Light Mode
+ion-item-divider {
+  --background: var(--ion-color-step-50, #f4f4f4);
+  --color: var(--ion-color-primary);
+  --padding-start: 16px;
+  --min-height: 32px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--ion-border-color);
+
+  ion-label {
+    margin: 8px 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+}

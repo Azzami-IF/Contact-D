@@ -1,15 +1,19 @@
-import { Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output, inject } from '@angular/core';
 import { Gesture, GestureController } from '@ionic/angular';
 
 @Directive({
   selector: '[appLongPress]',
-  standalone: false
+  standalone: true
 })
 export class LongPressDirective implements OnInit, OnDestroy {
   @Output() longPress = new EventEmitter();
   private gesture?: Gesture;
+  private timer?: any;
 
-  constructor(private el: ElementRef, private gestureCtrl: GestureController) {}
+  private el = inject(ElementRef);
+  private gestureCtrl = inject(GestureController);
+
+  constructor() {}
 
   ngOnInit() {
     this.gesture = this.gestureCtrl.create({
@@ -17,16 +21,15 @@ export class LongPressDirective implements OnInit, OnDestroy {
       threshold: 0,
       gestureName: 'long-press',
       onStart: () => {
-        const timeout = setTimeout(() => {
+        this.timer = setTimeout(() => {
           this.longPress.emit();
         }, 500);
-
-        // Clear timeout if the gesture ends early
-        this.gesture!.setDisabled(false);
-        const onEnd = () => {
-          clearTimeout(timeout);
-        };
-        this.gesture!.onEnd = onEnd;
+      },
+      onEnd: () => {
+        if (this.timer) {
+          clearTimeout(this.timer);
+          this.timer = undefined;
+        }
       }
     });
     this.gesture.enable(true);
@@ -35,6 +38,9 @@ export class LongPressDirective implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.gesture) {
       this.gesture.destroy();
+    }
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
   }
 }

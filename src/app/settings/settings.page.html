@@ -47,7 +47,31 @@
     </ion-item>
   </ion-list>
 
+  <ion-list-header>
+    <ion-label color="primary">INFORMASI APLIKASI</ion-label>
+  </ion-list-header>
+
+  <ion-list inset="true">
+    <ion-item button (click)="openPrivacyPolicy()" detail="true">
+      <ion-icon name="shield-checkmark-outline" slot="start" color="success"></ion-icon>
+      <ion-label>Kebijakan Privasi</ion-label>
+    </ion-item>
+
+    <ion-item button (click)="sendFeedback()" detail="true">
+      <ion-icon name="chatbubble-ellipses-outline" slot="start" color="tertiary"></ion-icon>
+      <ion-label>Kirim Masukan (Feedback)</ion-label>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-icon name="information-circle-outline" slot="start" color="medium"></ion-icon>
+      <ion-label>
+        <h2>Versi Aplikasi</h2>
+        <p>1.0.5 (Stable)</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
   <div class="ion-padding footer-info">
-    <p class="ion-text-center">Aplikasi Dalam Masa Pengembangan.</p>
+    <p class="ion-text-center">Aplikasi dalam tahap closed testing</p>
   </div>
 </ion-content>

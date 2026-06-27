@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { Contact, AdditionalField } from '../models/contact.model';
 import { ContactService } from '../services/contact.service';
 import { LabelService } from '../services/label.service';
@@ -40,6 +40,15 @@ export class ContactEditPage implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  private formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private contactService = inject(ContactService);
+  private labelService = inject(LabelService);
+  private alertController = inject(AlertController);
+  private sidebarService = inject(SidebarService);
+  private loadingController = inject(LoadingController);
+
   private fieldOptions: FieldOption[] = [
     { type: 'phone', label: 'Telepon', placeholder: 'Masukkan nomor telepon' },
     { type: 'email', label: 'Email', placeholder: 'Masukkan email' },
@@ -47,15 +56,7 @@ export class ContactEditPage implements OnInit, OnDestroy {
     { type: 'birthday', label: 'Ulang Tahun', placeholder: 'Pilih tanggal' },
   ];
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private contactService: ContactService,
-    private labelService: LabelService,
-    private alertController: AlertController,
-    private sidebarService: SidebarService
-  ) {
+  constructor() {
     this.contactForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: [''],
@@ -240,21 +241,58 @@ export class ContactEditPage implements OnInit, OnDestroy {
 
   updateContact(): void {
     if (!this.isFormValid() || !this.contactId) return;
+    this.executeSave();
+  }
+
+  private async executeSave(): Promise<void> {
+    const loading = await this.loadingController.create({
+      message: 'Menyimpan...',
+      duration: 2000
+    });
+    await loading.present();
 
     const fields = [...this.additionalFields];
+
+    // Basic Validation for fields (e.g. Email format)
+    const emailFields = fields.filter(f => f.type === 'email' && f.value.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (const emailField of emailFields) {
+      if (!emailRegex.test(emailField.value)) {
+        await loading.dismiss();
+        const alert = await this.alertController.create({
+          header: 'Format Email Salah',
+          message: `Alamat email "${emailField.value}" tidak valid.`,
+          buttons: ['OK']
+        });
+        await alert.present();
+        return;
+      }
+    }
+
     this.selectedLabels.forEach((label, i) => {
       fields.push({ id: `label-${Date.now()}-${i}`, type: 'label', label: 'Label', value: label });
     });
 
-    this.contactService.updateContact(this.contactId, {
-      firstName: this.contactForm.get('firstName')?.value.trim(),
-      lastName: this.contactForm.get('lastName')?.value.trim(),
-      company: this.contactForm.get('company')?.value || '',
-      notes: this.contactForm.get('notes')?.value || '',
-      profileImage: this.profileImageBase64 || undefined,
-      additionalFields: fields,
-    });
-    this.router.navigate(['/contact-detail', this.contactId]);
+    try {
+      this.contactService.updateContact(this.contactId!, {
+        firstName: this.contactForm.get('firstName')?.value.trim(),
+        lastName: this.contactForm.get('lastName')?.value.trim(),
+        company: this.contactForm.get('company')?.value || '',
+        notes: this.contactForm.get('notes')?.value || '',
+        profileImage: this.profileImageBase64 || undefined,
+        additionalFields: fields,
+      });
+      await loading.dismiss();
+      this.router.navigate(['/contact-detail', this.contactId]);
+    } catch (error) {
+      await loading.dismiss();
+      const alert = await this.alertController.create({
+        header: 'Gagal Menyimpan',
+        message: 'Terjadi kesalahan saat menyimpan kontak.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
   }
 
   cancel(): void {

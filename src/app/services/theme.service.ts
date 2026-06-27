@@ -45,7 +45,12 @@ export class ThemeService {
     } else {
       isDark = mode === 'dark';
     }
+
+    // Apply class to body
     document.body.classList.toggle('dark', isDark);
+
+    // Optional: Add transition effect to make it smoother
+    document.body.style.transition = 'background-color 0.3s ease';
   }
 
   getCurrentTheme(): ThemeMode {

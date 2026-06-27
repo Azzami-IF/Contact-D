@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ThemeService, ThemeMode } from '../services/theme.service';
 import { ImportExportService } from '../services/import-export.service';
 import { SidebarService } from '../services/sidebar.service';
@@ -13,12 +13,12 @@ import { AlertController } from '@ionic/angular';
 export class SettingsPage implements OnInit {
   currentTheme: ThemeMode = 'system';
 
-  constructor(
-    private themeService: ThemeService,
-    private importExportService: ImportExportService,
-    private sidebarService: SidebarService,
-    private alertController: AlertController
-  ) { }
+  private themeService = inject(ThemeService);
+  private importExportService = inject(ImportExportService);
+  private sidebarService = inject(SidebarService);
+  private alertController = inject(AlertController);
+
+  constructor() { }
 
   ngOnInit() {
     this.currentTheme = this.themeService.getCurrentTheme();
@@ -66,10 +66,17 @@ export class SettingsPage implements OnInit {
         });
 
         await alert.present();
-      } else {
-        // Reset input on failure
-        event.target.value = '';
       }
     }
+  }
+
+  openPrivacyPolicy() {
+    window.open('https://shorturl.at/rUFZY', '_blank');
+  }
+
+  sendFeedback() {
+    const subject = encodeURIComponent('Feedback Aplikasi Contact-D');
+    const body = encodeURIComponent('Halo Pengembang,\n\nSaya ingin memberikan masukan terkait aplikasi ini:\n');
+    window.location.href = `mailto:ambatu.dev@gmail.com?subject=${subject}&body=${body}`;
   }
 }

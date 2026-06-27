@@ -1,18 +1,22 @@
 package com.contact_d.ambatu;
 
 import android.os.Bundle;
-import androidx.activity.EdgeToEdge;
+import android.os.SystemClock;
 import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        // Install the splash screen
-        SplashScreen.installSplashScreen(this);
+  private static final long SPLASH_DURATION_MS = 800;
 
-        // Android 15 edge-to-edge support
-        EdgeToEdge.enable(this);
-        super.onCreate(savedInstanceState);
-    }
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    long splashStartedAt = SystemClock.uptimeMillis();
+    SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+
+    splashScreen.setKeepOnScreenCondition(() ->
+      SystemClock.uptimeMillis() - splashStartedAt < SPLASH_DURATION_MS
+    );
+
+    super.onCreate(savedInstanceState);
+  }
 }

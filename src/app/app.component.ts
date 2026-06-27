@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AlertController, Platform } from '@ionic/angular';
 import { SidebarService } from './services/sidebar.service';
 import { ThemeService } from './services/theme.service';
@@ -16,12 +16,12 @@ export class AppComponent implements OnInit, OnDestroy {
   sidebarOpen = false;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private alertController: AlertController,
-    private sidebarService: SidebarService,
-    private themeService: ThemeService,
-    private platform: Platform
-  ) {
+  private alertController = inject(AlertController);
+  private sidebarService = inject(SidebarService);
+  private themeService = inject(ThemeService);
+  private platform = inject(Platform);
+
+  constructor() {
     this.initializeApp();
   }
 

@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { Contact, AdditionalField } from '../models/contact.model';
 import { ContactService } from '../services/contact.service';
 import { LabelService } from '../services/label.service';
@@ -38,6 +38,14 @@ export class ContactAddPage implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
+  private contactService = inject(ContactService);
+  private labelService = inject(LabelService);
+  private alertController = inject(AlertController);
+  private sidebarService = inject(SidebarService);
+  private loadingController = inject(LoadingController);
+
   private fieldOptions: FieldOption[] = [
     { type: 'phone', label: 'Telepon', placeholder: 'Masukkan nomor telepon' },
     { type: 'email', label: 'Email', placeholder: 'Masukkan email' },
@@ -45,14 +53,7 @@ export class ContactAddPage implements OnInit, OnDestroy {
     { type: 'birthday', label: 'Ulang Tahun', placeholder: 'Pilih tanggal' },
   ];
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private router: Router,
-    private contactService: ContactService,
-    private labelService: LabelService,
-    private alertController: AlertController,
-    private sidebarService: SidebarService
-  ) {
+  constructor() {
     this.contactForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: [''],
@@ -209,12 +210,62 @@ export class ContactAddPage implements OnInit, OnDestroy {
     this.additionalFields.splice(index, 1);
   }
 
-  saveContact(): void {
+  async saveContact(): Promise<void> {
     if (!this.isFormValid()) return;
+
+    const firstName = this.contactForm.get('firstName')?.value.trim();
+    const lastName = this.contactForm.get('lastName')?.value.trim();
+
+    // 1. Check for duplicates
+    const existing = this.contactService.getContacts().find(c =>
+      c.firstName.toLowerCase() === firstName.toLowerCase() &&
+      c.lastName.toLowerCase() === lastName.toLowerCase()
+    );
+
+    if (existing) {
+      const alert = await this.alertController.create({
+        header: 'Kontak Duplikat',
+        message: `Kontak dengan nama "${firstName} ${lastName}" sudah ada. Tetap simpan?`,
+        buttons: [
+          { text: 'Batal', role: 'cancel' },
+          { text: 'Tetap Simpan', handler: () => this.executeSave() }
+        ]
+      });
+      await alert.present();
+    } else {
+      await this.executeSave();
+    }
+  }
+
+  private async executeSave(): Promise<void> {
+    const loading = await this.loadingController.create({
+      message: 'Menyimpan...',
+      duration: 2000
+    });
+    await loading.present();
+
     const fields = [...this.additionalFields];
+
+    // Basic Validation for fields (e.g. Email format)
+    const emailFields = fields.filter(f => f.type === 'email' && f.value.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (const emailField of emailFields) {
+      if (!emailRegex.test(emailField.value)) {
+        await loading.dismiss();
+        const alert = await this.alertController.create({
+          header: 'Format Email Salah',
+          message: `Alamat email "${emailField.value}" tidak valid.`,
+          buttons: ['OK']
+        });
+        await alert.present();
+        return;
+      }
+    }
+
     this.selectedLabels.forEach((label, i) => {
       fields.push({ id: `label-${Date.now()}-${i}`, type: 'label', label: 'Label', value: label });
     });
+
     const newContact: Partial<Contact> = {
       firstName: this.contactForm.get('firstName')?.value.trim(),
       lastName: this.contactForm.get('lastName')?.value.trim(),
@@ -224,8 +275,20 @@ export class ContactAddPage implements OnInit, OnDestroy {
       additionalFields: fields,
       isFavorite: false,
     };
-    this.contactService.addContact(newContact as Contact);
-    this.router.navigate(['/home']);
+
+    try {
+      this.contactService.addContact(newContact as Contact);
+      await loading.dismiss();
+      this.router.navigate(['/home']);
+    } catch (error) {
+      await loading.dismiss();
+      const alert = await this.alertController.create({
+        header: 'Gagal Menyimpan',
+        message: 'Terjadi kesalahan saat menyimpan kontak.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    }
   }
 
   cancel(): void {
